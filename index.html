@@ -261,6 +261,17 @@
         .alert-orange { background: rgba(234, 179, 8, 0.12); border-left: 4px solid var(--warning); color: #fde047; }
         .alert-green { background: rgba(34, 197, 94, 0.12); border-left: 4px solid var(--success); color: #86efac; }
 
+        /* Styles Graphique SVG */
+        .chart-container {
+            width: 100%;
+            background: #0f172a;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 10px;
+            box-sizing: border-box;
+            margin-top: 15px;
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -273,7 +284,7 @@
     </header>
 
     <form id="formulaForm">
-        <!-- 1. Discipline (Leurres uniquement) -->
+        <!-- 1. Discipline -->
         <div class="section-card">
             <h2>1. Discipline</h2>
             <div class="grid">
@@ -583,6 +594,24 @@
             </h3>
             <div id="scoreBadge" class="score-badge"></div>
             <div id="alertsContainer"></div>
+
+            <!-- NOUVEAU : Graphique Dynamique 5 Zones SVG -->
+            <div class="chart-container">
+                <h4 style="margin: 0 0 10px 0; color: var(--accent); font-size: 0.95em;">📈 Courbe de Charge du Blank & Puce du Montage</h4>
+                <svg id="zoneChartSvg" viewBox="0 0 600 220" style="width: 100%; height: auto; display: block;"></svg>
+            </div>
+
+            <!-- Tableau d'Analyse des Formules -->
+            <table style="width:100%; margin-top:15px; border-collapse:collapse; font-size:0.85em; text-align:left;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border); color: var(--text-muted);">
+                        <th style="padding: 6px;">Zone Dynamique</th>
+                        <th style="padding: 6px;">Intervalle de Masse</th>
+                        <th style="padding: 6px;">Comportement & Physique du Lancer</th>
+                    </tr>
+                </thead>
+                <tbody id="physicsTableBody"></tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -812,7 +841,7 @@
         return (sel.value === 'none' || sel.value.toLowerCase() === 'standard') ? '' : sel.value;
     }
 
-    // MOTEUR DE DIAGNOSTIC DE COHÉRENCE
+    // --- MOTEUR DE DIAGNOSTIC ET RENDER DU GRAPHIQUE SVG ---
     function evaluateCoherence(pMin, pMax, peValue, bdlDiameters, lureWeights, lureTypes) {
         let alerts = [];
         let score = 10;
@@ -884,7 +913,133 @@
         }
 
         if (score < 0) score = 0;
+
+        // --- GÉNÉRATION DU GRAPHIQUE 5 ZONES SVG ---
+        renderFiveZoneChart(pMin, pMax, maxWeight);
+
         return { score, alerts };
+    }
+
+    function renderFiveZoneChart(pMin, pMax, currentLureWeight) {
+        const svg = document.getElementById('zoneChartSvg');
+        const w = 600, h = 220;
+        const margin = { top: 25, right: 30, bottom: 40, left: 45 };
+        const graphW = w - margin.left - margin.right;
+        const graphH = h - margin.top - margin.bottom;
+
+        // Bornes dynamiques de l'axe X (de 0 à Pmax * 1.35)
+        const xMax = Math.max(pMax * 1.35, currentLureWeight * 1.15);
+        
+        // Bornes des 5 zones
+        const z1End = pMin; // Sous-charge: [0, pMin]
+        const z2End = pMin + 0.25 * (pMax - pMin); // Plage basse
+        const z3End = pMin + 0.75 * (pMax - pMin); // Sweet Spot
+        const z4End = pMax; // Plage haute
+        // Surcharge: [pMax, xMax]
+
+        function getX(val) {
+            return margin.left + (val / xMax) * graphW;
+        }
+
+        function getY(efficiency) { // efficiency de 0.0 à 1.0
+            return margin.top + graphH - (efficiency * graphH);
+        }
+
+        const x0 = getX(0);
+        const xZ1 = getX(z1End);
+        const xZ2 = getX(z2End);
+        const xZ3 = getX(z3End);
+        const xZ4 = getX(z4End);
+        const xZ5 = getX(xMax);
+
+        // Position du leurre sélectionné
+        const xLure = getX(currentLureWeight);
+
+        // Calcul de l'efficience théorique (courbe parabole) pour placer le point Y
+        let lureEff = 0;
+        if (currentLureWeight < pMin) {
+            lureEff = 0.2 * (currentLureWeight / pMin);
+        } else if (currentLureWeight <= pMax) {
+            // Zone optimale entre 0.7 et 1.0
+            let ratio = (currentLureWeight - pMin) / (pMax - pMin);
+            lureEff = 1.0 - Math.pow(ratio - 0.5, 2) * 2.5; 
+            if (lureEff < 0.3) lureEff = 0.3;
+        } else {
+            lureEff = Math.max(0.1, 0.4 - (currentLureWeight - pMax) / (pMax * 0.5));
+        }
+        const yLure = getY(lureEff);
+
+        svg.innerHTML = `
+            <!-- Background Zones -->
+            <rect x="${x0}" y="${margin.top}" width="${xZ1 - x0}" height="${graphH}" fill="rgba(239, 68, 68, 0.25)" />
+            <rect x="${xZ1}" y="${margin.top}" width="${xZ2 - xZ1}" height="${graphH}" fill="rgba(234, 179, 8, 0.2)" />
+            <rect x="${xZ2}" y="${margin.top}" width="${xZ3 - xZ2}" height="${graphH}" fill="rgba(34, 197, 94, 0.35)" />
+            <rect x="${xZ3}" y="${margin.top}" width="${xZ4 - xZ3}" height="${graphH}" fill="rgba(234, 179, 8, 0.2)" />
+            <rect x="${xZ4}" y="${margin.top}" width="${xZ5 - xZ4}" height="${graphH}" fill="rgba(239, 68, 68, 0.35)" />
+
+            <!-- Vertical Zone Lines -->
+            <line x1="${xZ1}" y1="${margin.top}" x2="${xZ1}" y2="${margin.top + graphH}" stroke="#ef4444" stroke-dasharray="3,3" />
+            <line x1="${xZ2}" y1="${margin.top}" x2="${xZ2}" y2="${margin.top + graphH}" stroke="#22c55e" stroke-dasharray="3,3" />
+            <line x1="${xZ3}" y1="${margin.top}" x2="${xZ3}" y2="${margin.top + graphH}" stroke="#22c55e" stroke-dasharray="3,3" />
+            <line x1="${xZ4}" y1="${margin.top}" x2="${xZ4}" y2="${margin.top + graphH}" stroke="#ef4444" stroke-dasharray="3,3" />
+
+            <!-- Smooth Efficiency Curve -->
+            <path d="M ${x0} ${getY(0.05)} 
+                     Q ${xZ1} ${getY(0.2)}, ${xZ2} ${getY(0.85)} 
+                     T ${xZ3} ${getY(0.85)} 
+                     Q ${xZ4} ${getY(0.4)}, ${xZ5} ${getY(0.05)}" 
+                  fill="none" stroke="#06b6d4" stroke-width="3" />
+
+            <!-- Point du montage sélectionné -->
+            <line x1="${xLure}" y1="${margin.top}" x2="${xLure}" y2="${margin.top + graphH}" stroke="#ffffff" stroke-width="1.5" />
+            <circle cx="${xLure}" cy="${yLure}" r="7" fill="#ffffff" stroke="#06b6d4" stroke-width="3" />
+            <text x="${xLure}" y="${yLure - 12}" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">${currentLureWeight}g</text>
+
+            <!-- Axis X Labels -->
+            <text x="${x0}" y="${h - 10}" fill="#94a3b8" font-size="10">0g</text>
+            <text x="${xZ1}" y="${h - 10}" fill="#fca5a5" font-size="10" text-anchor="middle">Pmin (${pMin}g)</text>
+            <text x="${xZ4}" y="${h - 10}" fill="#fca5a5" font-size="10" text-anchor="middle">Pmax (${pMax}g)</text>
+
+            <!-- Zone Titles (Headers) -->
+            <text x="${(x0 + xZ1)/2}" y="${margin.top - 8}" fill="#fca5a5" font-size="9" text-anchor="middle">1. Sous-charge</text>
+            <text x="${(xZ1 + xZ2)/2}" y="${margin.top - 8}" fill="#fde047" font-size="9" text-anchor="middle">2. Basse</text>
+            <text x="${(xZ2 + xZ3)/2}" y="${margin.top - 8}" fill="#86efac" font-size="10" font-weight="bold" text-anchor="middle">3. SWEET SPOT</text>
+            <text x="${(xZ3 + xZ4)/2}" y="${margin.top - 8}" fill="#fde047" font-size="9" text-anchor="middle">4. Haute</text>
+            <text x="${(xZ4 + xZ5)/2}" y="${margin.top - 8}" fill="#fca5a5" font-size="9" text-anchor="middle">5. Surcharge</text>
+        `;
+
+        // Mise à jour du tableau physique
+        const sweetMin = z2End;
+        const sweetMax = z3End;
+        const tableBody = document.getElementById('physicsTableBody');
+
+        tableBody.innerHTML = `
+            <tr style="border-bottom: 1px solid var(--border); ${currentLureWeight < pMin ? 'background:rgba(239,68,68,0.15);' : ''}">
+                <td style="padding: 6px; color:#fca5a5;"><b>1. Sous-charge</b></td>
+                <td style="padding: 6px;">0g à ${pMin}g</td>
+                <td style="padding: 6px;">Le scion ne fléchit pas. Restitution d'énergie nulle, lancers très courts.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border); ${(currentLureWeight >= pMin && currentLureWeight < sweetMin) ? 'background:rgba(234,179,8,0.15);' : ''}">
+                <td style="padding: 6px; color:#fde047;"><b>2. Plage Basse</b></td>
+                <td style="padding: 6px;">${pMin}g à ${sweetMin.toFixed(1)}g</td>
+                <td style="padding: 6px;">Chargement léger du scion. Idéal pour les pêches fines et tactiles.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border); ${(currentLureWeight >= sweetMin && currentLureWeight <= sweetMax) ? 'background:rgba(34,197,94,0.15);' : ''}">
+                <td style="padding: 6px; color:#86efac;"><b>3. Sweet Spot (Zone Optimale)</b></td>
+                <td style="padding: 6px; color:#4ade80;"><b>${sweetMin.toFixed(1)}g à ${sweetMax.toFixed(1)}g</b></td>
+                <td style="padding: 6px;">Rendement mécanique maximal (ressort parfait). Lancers longs sans effort.</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border); ${(currentLureWeight > sweetMax && currentLureWeight <= pMax) ? 'background:rgba(234,179,8,0.15);' : ''}">
+                <td style="padding: 6px; color:#fde047;"><b>4. Plage Haute</b></td>
+                <td style="padding: 6px;">${sweetMax.toFixed(1)}g à ${pMax}g</td>
+                <td style="padding: 6px;">Canne très sollicitée. Lancer fluide recommandé (éviter le fouetté sec).</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border); ${currentLureWeight > pMax ? 'background:rgba(239,68,68,0.15);' : ''}">
+                <td style="padding: 6px; color:#fca5a5;"><b>5. Surcharge Critiques</b></td>
+                <td style="padding: 6px;">> ${pMax}g</td>
+                <td style="padding: 6px; color:#fca5a5;">DANGER : Contrainte supérieure à la résistance mécanique du blank (risque de casse).</td>
+            </tr>
+        `;
     }
 
     function generateFormula() {
@@ -896,7 +1051,6 @@
         let minP = parseFloat(minPVal) || 0;
         let maxP = parseFloat(maxPVal) || 0;
 
-        // Validation anti-absurde de la puissance
         if (minP < 0 || maxP <= 0 || minP >= maxP || maxP > 1000) {
             alert("Erreur dans les puissances de la canne : la puissance Min doit être inférieure à la puissance Max (ex: 7 à 28g).");
             return;
@@ -906,14 +1060,12 @@
         const cBrins = getVal('canneBrins', 'canneBrinsCustom');
         const cBlank = getVal('canneBlank', 'canneBlankCustom');
 
-        // Canne ultra-compacte (Longueur collée au C)
         let cBrinsSup = cBrins ? `^{${cBrins}}` : '';
         let cBlankSub = cBlank ? `_{\\text{${cBlank}}}` : '';
         let cActionPuis = cAction ? `${cAction}, ${cPuis}` : cPuis;
 
         const canneStr = `C_{\\text{${cLong}}${cBrinsSup}${cBlankSub}}^{\\text{${cActionPuis}}}`;
 
-        // Moulinet ultra-compact (Bâti en indice, kg supprimé)
         const mType = document.getElementById('moulinetType').value;
         const mTaille = getVal('moulinetTaille', 'moulinetTailleCustom');
         const mRatio = getVal('moulinetRatio', 'moulinetRatioCustom');
@@ -921,7 +1073,6 @@
         let mRatioSup = (mRatio && mRatio !== 'none') ? `, ${mRatio}` : '';
         const moulinetStr = `M_{\\text{${mTaille}}}^{\\text{${mType}${mRatioSup}}}`;
 
-        // Ligne Principale
         const lType = document.getElementById('ligneType').value;
         let lParam = (lType === 'T') 
             ? getVal('lignePE', 'lignePECustom')
@@ -936,7 +1087,6 @@
         const ligneStr = `${lType}_{\\text{${lParam}}}`;
         const noeud1 = document.getElementById('noeud1').value;
 
-        // Bas de Ligne / Montage Drop-Shot
         const bdl1Mat = document.getElementById('bdl1Mat').value;
         const bdl1Diam = getVal('bdl1Diam', 'bdl1DiamCustom');
         const bdl1Long = getVal('bdl1Long', 'bdl1LongCustom');
@@ -963,7 +1113,6 @@
             }
         }
 
-        // Attache & Boîte à leurres
         const fixFinal = document.getElementById('fixationFinal').value;
         const lureItems = document.querySelectorAll('.lure-item');
         let luresArray = [];
@@ -990,15 +1139,12 @@
             ? luresArray[0]
             : `\\left\\{ \\begin{array}{l} ` + luresArray.join(' \\\\ ') + ` \\end{array} \\right.`;
 
-        // Assemblage final Épuré
         const latexFormula = `\\left\\{ ${canneStr} \\ + \\ ${moulinetStr} \\right\\} \\ \\longrightarrow \\ ${ligneStr} ${noeud1} ${bdl1Str}${section2Str} \\ ${fixFinal} \\ \\longrightarrow \\ ${luresLaTeX}`;
 
-        // Rendu LaTeX
         document.getElementById('rawLatex').innerText = latexFormula;
         const renderedDiv = document.getElementById('renderedMath');
         renderedDiv.innerHTML = `\\[ ${latexFormula} \\]`;
 
-        // Diagnostic de cohérence
         const diag = evaluateCoherence(minP, maxP, peVal, [bdl1DiamNum, bdl2DiamNum], lureWeights, lureTypes);
         
         const badgeElem = document.getElementById('scoreBadge');
