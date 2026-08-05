@@ -17,7 +17,6 @@
             --border: #334155;
             --danger: #ef4444;
             --warning: #eab308;
-            --success: #22c55e;
             --info-bg: #091e3a;
         }
 
@@ -32,7 +31,7 @@
         }
 
         .container {
-            max-width: 950px;
+            max-width: 980px;
             width: 100%;
         }
 
@@ -119,10 +118,21 @@
             line-height: 1.4;
         }
 
+        .alert-box {
+            background-color: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-top: 15px;
+            font-size: 0.88em;
+            color: #fca5a5;
+            line-height: 1.4;
+        }
+
         .lure-item {
             background-color: #0f172a;
-            border: 1px dashed var(--border);
-            padding: 12px;
+            border: 1px solid var(--border);
+            padding: 14px;
             border-radius: 8px;
             margin-bottom: 12px;
             position: relative;
@@ -186,7 +196,7 @@
             font-size: 1.4em;
             margin-bottom: 20px;
             overflow-x: auto;
-            padding: 10px 0;
+            padding: 15px 0;
         }
 
         .raw-latex {
@@ -224,7 +234,7 @@
 <div class="container">
     <header>
         <h1>AnglerMath 🎣</h1>
-        <p>Générateur de formalisation synthétique pour montages de pêche</p>
+        <p>Générateur de formalisation synthétique & Champ des possibles</p>
     </header>
 
     <form id="formulaForm">
@@ -304,7 +314,6 @@
                     <input type="text" id="canneLongCustom" class="custom-input hidden" placeholder="ex: 2.15m">
                 </div>
 
-                <!-- Champs optionnels (Non obligatoires dans la formule) -->
                 <div class="form-group">
                     <label for="canneBlank">Blank (Optionnel)</label>
                     <select id="canneBlank" onchange="checkCustom(this, 'canneBlankCustom')">
@@ -313,7 +322,6 @@
                         <option value="T1100G">T1100G</option>
                         <option value="Morpho">Morpho</option>
                         <option value="Glass">Glass-Blank</option>
-                        <option value="Saltwater">Saltwater</option>
                         <option value="custom">Autre...</option>
                     </select>
                     <input type="text" id="canneBlankCustom" class="custom-input hidden" placeholder="Nom du Blank">
@@ -355,30 +363,25 @@
             <div class="grid">
                 <div class="form-group">
                     <label for="moulinetType">Type *</label>
-                    <select id="moulinetType">
+                    <select id="moulinetType" onchange="updateReelSizes()">
                         <option value="Sp">Spinning (Sp)</option>
                         <option value="Bc">Baitcasting (Bc)</option>
                         <option value="Fly, LA">Mouche Large Arbor (Fly, LA)</option>
-                        <option value="Fly, Semi-Auto">Mouche Semi-Auto</option>
                     </select>
                 </div>
 
+                <!-- Bâti filtré dynamiquement selon Spinning vs Casting -->
                 <div class="form-group">
                     <label for="moulinetTaille">Taille Bâti *</label>
-                    <select id="moulinetTaille" onchange="checkCustom(this, 'moulinetTailleCustom')">
-                        <option value="1000">1000</option><option value="2000">2000</option>
-                        <option value="2500" selected>2500</option><option value="3000">3000</option>
-                        <option value="4000">4000</option><option value="100">100 (Casting)</option>
-                        <option value="150">150 (Casting)</option><option value="200">200 (Casting)</option>
-                        <option value="300">300 (Casting)</option>
-                        <option value="custom">Autre...</option>
+                    <select id="moulinetTaille" onchange="checkCustom(this, 'moulinetTailleCustom'); updateSpoolAdvice();">
+                        <!-- Rempli par JS -->
                     </select>
-                    <input type="text" id="moulinetTailleCustom" class="custom-input hidden" placeholder="ex: 5000">
+                    <input type="text" id="moulinetTailleCustom" class="custom-input hidden" placeholder="ex: 2500">
                 </div>
 
                 <div class="form-group">
                     <label for="moulinetRatio">Ratio / Vitesse *</label>
-                    <select id="moulinetRatio" onchange="checkCustom(this, 'moulinetRatioCustom')">
+                    <select id="moulinetRatio" onchange="checkCustom(this, 'moulinetRatioCustom'); updateSpoolAdvice();">
                         <option value="Standard">Standard</option>
                         <option value="HG" selected>HG (High Gear)</option>
                         <option value="XG">XG (Extra High Gear)</option>
@@ -401,9 +404,8 @@
                 </div>
             </div>
 
-            <!-- Conseil de remplissage & TMV suggéré -->
             <div id="spoolAdviceBox" class="helper-box">
-                💡 <b>Conseils Moulinet & Remplissage :</b> Sélectionne la ligne principale ci-dessous pour calculer le remplissage recommandé (longueur fil + backing).
+                💡 <b>Conseils Moulinet & Remplissage :</b> Mise à jour...
             </div>
         </div>
 
@@ -442,7 +444,6 @@
                     <input type="text" id="ligneParamCustom" class="custom-input hidden" placeholder="ex: 23">
                 </div>
 
-                <!-- Nœuds nettoyés et diversifiés -->
                 <div class="form-group">
                     <label for="noeud1">Premier Nœud de Raccord *</label>
                     <select id="noeud1">
@@ -458,9 +459,9 @@
             </div>
         </div>
 
-        <!-- 5. Bas de Ligne -->
+        <!-- 5. Bas de Ligne & Montage Spécifique -->
         <div class="section-card">
-            <h2>5. Bas de Ligne & Avançon</h2>
+            <h2>5. Bas de Ligne & Montage Spécifique</h2>
             <div class="grid">
                 <div class="form-group">
                     <label for="bdl1Mat">Matériau *</label>
@@ -481,7 +482,6 @@
                         <option value="50">50/100</option><option value="60">60/100</option>
                         <option value="70">70/100</option><option value="80">80/100</option>
                         <option value="90">90/100</option><option value="100">100/100</option>
-                        <option value="45 \rightarrow 15">45 → 15 (Mouche)</option>
                         <option value="custom">Autre...</option>
                     </select>
                     <input type="text" id="bdl1DiamCustom" class="custom-input hidden" placeholder="ex: 28">
@@ -492,81 +492,91 @@
                     <select id="bdl1Long" onchange="checkCustom(this, 'bdl1LongCustom')">
                         <option value="1.2m">1.2m</option><option value="1.5m">1.5m</option>
                         <option value="2m" selected>2m</option><option value="2.5m">2.5m</option>
-                        <option value="3m">3m</option><option value="4.5m">4.5m</option>
-                        <option value="45cm">45cm</option><option value="50cm">50cm</option>
+                        <option value="3m">3m</option><option value="45cm">45cm</option>
                         <option value="custom">Autre...</option>
                     </select>
                     <input type="text" id="bdl1LongCustom" class="custom-input hidden" placeholder="ex: 1.8m">
                 </div>
             </div>
 
-            <!-- Avançon 2ème section -->
-            <h3 style="font-size: 0.95em; color: var(--text-muted); margin-top: 15px;">Avançon / Section 2 (Optionnel)</h3>
+            <!-- Avançon ou Montage Spécial -->
+            <h3 style="font-size: 0.95em; color: var(--text-muted); margin-top: 15px;">Avançon / Montage Spécifique (Optionnel)</h3>
             <div class="grid">
                 <div class="form-group">
+                    <label for="montageType">Style de Montage</label>
+                    <select id="montageType" onchange="toggleMontageSpecial()">
+                        <option value="direct" selected>Ligne Directe / Avançon classique</option>
+                        <option value="dropshot">Montage Drop-Shot (DS)</option>
+                        <option value="carolina">Montage Carolina / Texas</option>
+                    </select>
+                </div>
+
+                <div class="form-group group-avancion-std">
                     <label for="noeud2">Raccord Avançon</label>
                     <select id="noeud2">
                         <option value="none" selected>Aucun (Pas d'avançon)</option>
                         <option value="\overset{\text{Gri}}{\sim}">Nœud Grinner / Uni</option>
                         <option value="\overset{\text{Blood}}{\sim}">Nœud de Sang</option>
-                        <option value="\overset{\text{Chir}}{\sim}">Nœud de Chirurgien</option>
                         <option value="\varnothing_{\text{Sl}}">Sleeve (Sertissage)</option>
                         <option value="ER">Émerillon Rolling (ER)</option>
                     </select>
                 </div>
-                <div class="form-group">
+
+                <div class="form-group group-avancion-std">
                     <label for="bdl2Mat">Matériau Avançon</label>
                     <select id="bdl2Mat">
                         <option value="none">Aucun</option>
                         <option value="F">Fluorocarbone (F)</option>
-                        <option value="N">Nylon (N)</option>
                         <option value="St">Acier (St - Steel)</option>
                         <option value="Ti">Titane (Ti)</option>
                         <option value="Wg">Tungstène (Wg)</option>
-                        <option value="Ind">Indicateur Bicolore (Ind)</option>
                     </select>
                 </div>
-                <div class="form-group">
+
+                <div class="form-group group-avancion-std">
                     <label for="bdl2Diam">Diamètre Avançon</label>
                     <select id="bdl2Diam" onchange="checkCustom(this, 'bdl2DiamCustom')">
                         <option value="40">40/100</option><option value="60">60/100</option>
-                        <option value="80" selected>80/100</option><option value="90">90/100</option>
-                        <option value="100">100/100</option>
+                        <option value="80" selected>80/100</option><option value="100">100/100</option>
                         <option value="custom">Autre...</option>
                     </select>
                     <input type="text" id="bdl2DiamCustom" class="custom-input hidden" placeholder="ex: 75">
                 </div>
-                <div class="form-group">
-                    <label for="bdl2Long">Longueur Avançon</label>
-                    <select id="bdl2Long" onchange="checkCustom(this, 'bdl2LongCustom')">
-                        <option value="30cm" selected>30cm</option><option value="40cm">40cm</option>
-                        <option value="50cm">50cm</option>
-                        <option value="custom">Autre...</option>
-                    </select>
-                    <input type="text" id="bdl2LongCustom" class="custom-input hidden" placeholder="ex: 35cm">
+
+                <!-- Champs spécifiques Drop-Shot -->
+                <div class="form-group group-ds hidden">
+                    <label for="dsPlomb">Plomb Drop-Shot (g)</label>
+                    <input type="text" id="dsPlomb" value="7g">
+                </div>
+                <div class="form-group group-ds hidden">
+                    <label for="dsEcart">Distance Hameçon-Plomb</label>
+                    <input type="text" id="dsEcart" value="40cm">
                 </div>
             </div>
         </div>
 
-        <!-- 6. Terminal & Leurres -->
+        <!-- 6. Terminal & Boîte à Leurres ("Champ des possibles") -->
         <div class="section-card">
-            <h2>6. Attache Terminale & Leurre(s) / Mouche(s)</h2>
+            <h2>6. Attache Terminale & Boîte à Leurres (Champ des Possibles)</h2>
             <div class="grid" style="margin-bottom: 15px;">
                 <div class="form-group">
                     <label for="fixationFinal">Attache Terminale *</label>
-                    <select id="fixationFinal">
+                    <select id="fixationFinal" onchange="checkIncoherences()">
                         <option value="A">Agrafe (A)</option>
                         <option value="AB">Anneau Brisé (AB)</option>
                         <option value="\varnothing_{\text{AB}}">Micro-Ring (\varnothing_{AB})</option>
                         <option value="\overset{\text{Cui}}{\sim}">Nœud Cuillère</option>
                         <option value="\overset{\text{Rap}}{\sim}">Nœud Rapala</option>
-                        <option value="\overset{\text{Pen}}{\sim}">Nœud Pendu</option>
+                        <option value="\overset{\text{Pal}}{\sim}">Nœud Palomar</option>
                     </select>
                 </div>
             </div>
 
+            <!-- Zone d'avertissement d'incohérence -->
+            <div id="incoherenceWarning" class="alert-box hidden"></div>
+
             <div id="luresContainer"></div>
-            <button type="button" class="btn-add" onclick="addLureInput()">+ Ajouter un leurre / mouche</button>
+            <button type="button" class="btn-add" onclick="addLureInput()">+ Ajouter une option de leurre dans la boîte</button>
         </div>
 
         <button type="button" class="btn-submit" onclick="generateFormula()">⚡ Générer la Formule Synthétique</button>
@@ -584,8 +594,8 @@
 <script>
     window.onload = function() {
         populatePE();
+        updateReelSizes();
         addLureInput("PT", "M", "12g");
-        updateSpoolAdvice();
     };
 
     function populatePE() {
@@ -603,6 +613,37 @@
         customOpt.value = "custom";
         customOpt.innerText = "Autre...";
         select.appendChild(customOpt);
+    }
+
+    // Filtrage dynamique des bâti de moulinets (Spinning vs Casting)
+    function updateReelSizes() {
+        const mType = document.getElementById('moulinetType').value;
+        const select = document.getElementById('moulinetTaille');
+        select.innerHTML = '';
+
+        let options = [];
+        if (mType === 'Sp') {
+            options = ['1000', '2000', '2500', '3000', '4000', '5000'];
+        } else if (mType === 'Bc') {
+            options = ['50', '70', '100', '150', '200', '300'];
+        } else {
+            options = ['#2/3', '#3/4', '#5/6', '#7/8', '#9/10'];
+        }
+
+        options.forEach(opt => {
+            let el = document.createElement('option');
+            el.value = opt;
+            el.innerText = opt;
+            if (opt === '2500' || opt === '150' || opt === '#3/4') el.selected = true;
+            select.appendChild(el);
+        });
+
+        let customOpt = document.createElement('option');
+        customOpt.value = "custom";
+        customOpt.innerText = "Autre...";
+        select.appendChild(customOpt);
+
+        updateSpoolAdvice();
     }
 
     function checkCustom(selectElem, customInputId) {
@@ -624,12 +665,14 @@
             moucheGroups.forEach(g => g.classList.remove('hidden'));
             document.getElementById('moulinetType').value = 'Fly, LA';
             document.getElementById('ligneType').value = 'S';
+            updateReelSizes();
             updateLigneUI();
         } else {
             lancerGroups.forEach(g => g.classList.remove('hidden'));
             moucheGroups.forEach(g => g.classList.add('hidden'));
             document.getElementById('moulinetType').value = 'Sp';
             document.getElementById('ligneType').value = 'T';
+            updateReelSizes();
             updateLigneUI();
         }
     }
@@ -649,7 +692,20 @@
         updateSpoolAdvice();
     }
 
-    // Calculateur de garnissage & conseils TMV
+    function toggleMontageSpecial() {
+        const type = document.getElementById('montageType').value;
+        const stdGroups = document.querySelectorAll('.group-avancion-std');
+        const dsGroups = document.querySelectorAll('.group-ds');
+
+        if (type === 'dropshot') {
+            stdGroups.forEach(g => g.classList.add('hidden'));
+            dsGroups.forEach(g => g.classList.remove('hidden'));
+        } else {
+            stdGroups.forEach(g => g.classList.remove('hidden'));
+            dsGroups.forEach(g => g.classList.add('hidden'));
+        }
+    }
+
     function updateSpoolAdvice() {
         const mTaille = getVal('moulinetTaille', 'moulinetTailleCustom');
         const lType = document.getElementById('ligneType').value;
@@ -658,28 +714,29 @@
         const adviceBox = document.getElementById('spoolAdviceBox');
 
         let lenLine = "130m à 150m";
-        let backingText = "Prevoir ~30-50m de backing Nylon (25/100) sous la tresse.";
+        let backingText = "Prévoir ~30-50m de backing Nylon (25/100) sous la tresse.";
 
-        if (mTaille === "1000") {
+        if (mTaille === "1000" || mTaille === "50") {
             lenLine = "100m";
             backingText = "Peu ou pas de backing nécessaire.";
-        } else if (parseInt(mTaille) >= 3000) {
+        } else if (parseInt(mTaille) >= 3000 || parseInt(mTaille) >= 200) {
             lenLine = "150m à 200m";
-            backingText = "Prevoir ~60-80m de backing Nylon (30/100) pour remplir la bobine.";
+            backingText = "Prévoir ~60-80m de backing Nylon (30/100) pour remplir la bobine.";
         }
 
-        let speedAdvice = "TMV standard (70-80cm/tmv) parfait pour le linéaire.";
+        let speedAdvice = "TMV standard (70-80cm/tmv) parfait pour la prospection linéaire.";
         if (ratio === "XG") {
-            speedAdvice = "TMV rapide (85-95cm/tmv) idéal pour Stickbait, Jerk et prospection rapide.";
+            speedAdvice = "TMV rapide (85-95cm/tmv) idéal pour Stickbait, Jerkbait et lancers rapides.";
         } else if (ratio === "Power") {
-            speedAdvice = "TMV lent / puissant (60-70cm/tmv) parfait pour Crankbait et Swimbaits lourds.";
+            speedAdvice = "TMV lent/puissant (60-70cm/tmv) parfait pour Crankbait et Swimbaits lourds.";
         }
 
         adviceBox.innerHTML = `💡 <b>Conseils Moulinet (${mTaille} - ${ratio}) :</b><br>` +
-            `• <b>Capacité optimale :</b> Enrouler <b>${lenLine}</b> de ${lType === 'T' ? peVal : 'fil principal'}. ${backingText}<br>` +
-            `• <b>Vitesse & Récupération :</b> ${speedAdvice}`;
+            `• <b>Capacité :</b> Enrouler <b>${lenLine}</b> de ${lType === 'T' ? peVal : 'fil principal'}. ${backingText}<br>` +
+            `• <b>Vitesse :</b> ${speedAdvice}`;
     }
 
+    // Gestion dynamique des leurres + sous-options (Profondeur / Montage)
     let lureCount = 0;
     function addLureInput(typeDef = "MN", sizeDef = "M", weightDef = "12g") {
         lureCount++;
@@ -692,21 +749,20 @@
             <button type="button" class="btn-remove" onclick="removeLure(${lureCount})">Supprimer</button>
             <div class="grid" style="margin-top: 5px;">
                 <div class="form-group">
-                    <label>Type de Leurre / Mouche</label>
-                    <select class="lure-type">
+                    <label>Leurre / Mouche</label>
+                    <select class="lure-type" onchange="updateLureSubParams(${lureCount})">
                         <option value="MN">Minnow (MN)</option>
                         <option value="JK">Jerkbait (JK)</option>
                         <option value="LB">Longbill Minnow (LB)</option>
                         <option value="ST">Stickbait (ST)</option>
                         <option value="PP">Popper (PP)</option>
                         <option value="CB">Crankbait (CB)</option>
+                        <option value="SP">Spinnerbait (SP)</option>
                         <option value="CH">Chatterbait (CH)</option>
                         <option value="PT">Paddletail / Shad (PT)</option>
                         <option value="GB">Glidebait (GB)</option>
                         <option value="SB">Swimbait (SB)</option>
                         <option value="Ny">Nymphe (Ny)</option>
-                        <option value="Str">Streamer (Str)</option>
-                        <option value="Mch">Mouche Sèche (Mch)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -722,17 +778,67 @@
                     <label>Poids / Détails</label>
                     <input type="text" class="lure-weight" value="${weightDef}" placeholder="ex: 15g">
                 </div>
+                <!-- Paramètre spécifique (Profondeur ou Montage) -->
+                <div class="form-group lure-sub-param" id="lure_sub_${lureCount}">
+                    <!-- Généré dynamiquement -->
+                </div>
             </div>
         `;
 
         container.appendChild(lureDiv);
         lureDiv.querySelector('.lure-type').value = typeDef;
         lureDiv.querySelector('.lure-size').value = sizeDef;
+        updateLureSubParams(lureCount);
+        checkIncoherences();
+    }
+
+    function updateLureSubParams(id) {
+        const lureItem = document.getElementById(`lure_${id}`);
+        const type = lureItem.querySelector('.lure-type').value;
+        const subBox = document.getElementById(`lure_sub_${id}`);
+
+        if (['CB', 'LB', 'MN'].includes(type)) {
+            subBox.innerHTML = `
+                <label>Profondeur (Bavette)</label>
+                <select class="lure-extra">
+                    <option value="SR">SR (Shallow - Peu profond)</option>
+                    <option value="MR">MR (Medium Runner)</option>
+                    <option value="DR">DR (Deep - Grand plongeur)</option>
+                </select>
+            `;
+        } else if (['PT', 'Ny'].includes(type)) {
+            subBox.innerHTML = `
+                <label>Montage Souple</label>
+                <select class="lure-extra">
+                    <option value="TP7g">Tête Plombée (TP 7g)</option>
+                    <option value="Tex">Texan (Anti-accroche)</option>
+                    <option value="W">Weightless (Sans plomb)</option>
+                </select>
+            `;
+        } else {
+            subBox.innerHTML = '';
+        }
+        checkIncoherences();
     }
 
     function removeLure(id) {
         const item = document.getElementById(`lure_${id}`);
         if (item) item.remove();
+        checkIncoherences();
+    }
+
+    // Vérification automatique des incohérences (ex: Agrafe sur Spinnerbait)
+    function checkIncoherences() {
+        const attache = document.getElementById('fixationFinal').value;
+        const lureTypes = Array.from(document.querySelectorAll('.lure-type')).map(s => s.value);
+        const warningDiv = document.getElementById('incoherenceWarning');
+
+        if (attache === 'A' && (lureTypes.includes('SP') || lureTypes.includes('CH'))) {
+            warningDiv.innerHTML = "⚠️ <b>Incohérence détectée :</b> L'utilisation d'une Agrafe (A) directement sur un Spinnerbait ou Chatterbait à œillet ouvert est déconseillée (l'agrafe glisse sur l'armature). Privilégiez un nœud direct ou un anneau brisé/joint tressé.";
+            warningDiv.classList.remove('hidden');
+        } else {
+            warningDiv.classList.add('hidden');
+        }
     }
 
     function getVal(selectId, customId) {
@@ -747,23 +853,17 @@
     function generateFormula() {
         const tech = document.getElementById('technique').value;
 
-        // 1. Canne (Gestion intelligente des options vides)
+        // 1. Canne
         const cBlank = getVal('canneBlank', 'canneBlankCustom');
         const cAnneaux = getVal('canneAnneaux', 'canneAnneauxCustom');
         const cAction = document.getElementById('canneAction').value;
         const cBrins = getVal('canneBrins', 'canneBrinsCustom');
         const cLong = getVal('canneLong', 'canneLongCustom');
 
-        let cPuis = "";
-        if (tech === 'mouche') {
-            cPuis = document.getElementById('canneSoie').value;
-        } else {
-            let minP = getVal('puiMin', 'puiMinCustom');
-            let maxP = getVal('puiMax', 'puiMaxCustom');
-            cPuis = `${minP}-${maxP}g`;
-        }
+        let cPuis = (tech === 'mouche') 
+            ? document.getElementById('canneSoie').value 
+            : `${getVal('puiMin', 'puiMinCustom')}-${getVal('puiMax', 'puiMaxCustom')}g`;
 
-        // Construction du sous-titre Canne (Blank/Anneaux) uniquement s'ils sont renseignés
         let cMatArray = [];
         if (cBlank && cBlank !== 'none') cMatArray.push(cBlank);
         if (cAnneaux && cAnneaux !== 'none') cMatArray.push(cAnneaux);
@@ -773,7 +873,7 @@
 
         const canneStr = `C${cMatSub}^{\\text{${cAction}, ${cPuis}}}[${cLong}${cBrinsSup}]`;
 
-        // 2. Moulinet (Compact)
+        // 2. Moulinet
         const mType = document.getElementById('moulinetType').value;
         const mTaille = getVal('moulinetTaille', 'moulinetTailleCustom');
         const mRatio = getVal('moulinetRatio', 'moulinetRatioCustom');
@@ -792,28 +892,33 @@
             : getVal('ligneParamText', 'ligneParamCustom');
         
         const ligneStr = `${lType}_{\\text{${lParam}}}`;
-
-        // 4. Nœud 1
         const noeud1 = document.getElementById('noeud1').value;
 
-        // 5. Bas de Ligne
+        // 4. Bas de Ligne / Montage Spécial
         const bdl1Mat = document.getElementById('bdl1Mat').value;
         const bdl1Diam = getVal('bdl1Diam', 'bdl1DiamCustom');
         const bdl1Long = getVal('bdl1Long', 'bdl1LongCustom');
-        const bdl1Str = `${bdl1Mat}_{\\text{${bdl1Long}}}^{${bdl1Diam}}`;
+        let bdl1Str = `${bdl1Mat}_{\\text{${bdl1Long}}}^{${bdl1Diam}}`;
 
-        // 6. Avançon Optionnel
-        const noeud2 = document.getElementById('noeud2').value;
-        const bdl2Mat = document.getElementById('bdl2Mat').value;
-        const bdl2Diam = getVal('bdl2Diam', 'bdl2DiamCustom');
-        const bdl2Long = getVal('bdl2Long', 'bdl2LongCustom');
-
+        const montageType = document.getElementById('montageType').value;
         let section2Str = "";
-        if (noeud2 !== "none" && bdl2Mat !== "none") {
-            section2Str = ` ${noeud2} ${bdl2Mat}_{\\text{${bdl2Long}}}^{${bdl2Diam}}`;
+
+        if (montageType === 'dropshot') {
+            const dsP = document.getElementById('dsPlomb').value;
+            const dsE = document.getElementById('dsEcart').value;
+            section2Str = ` \\overset{\\text{Pal}}{\\sim} H_{\\text{Texan}} \\ \\overset{${dsE}}{\\sim} \\ P_{${dsP}}`;
+        } else {
+            const noeud2 = document.getElementById('noeud2').value;
+            const bdl2Mat = document.getElementById('bdl2Mat').value;
+            const bdl2Diam = getVal('bdl2Diam', 'bdl2DiamCustom');
+            const bdl2Long = getVal('bdl2Long', 'bdl2LongCustom');
+
+            if (noeud2 !== "none" && bdl2Mat !== "none") {
+                section2Str = ` ${noeud2} ${bdl2Mat}_{\\text{${bdl2Long}}}^{${bdl2Diam}}`;
+            }
         }
 
-        // 7. Attache terminale & Leurres
+        // 5. Attache & Champ des Possibles (Accolade verticale des Leurres)
         const fixFinal = document.getElementById('fixationFinal').value;
         const lureItems = document.querySelectorAll('.lure-item');
         let luresArray = [];
@@ -822,18 +927,26 @@
             const lType = item.querySelector('.lure-type').value;
             const lSize = item.querySelector('.lure-size').value;
             const lWeight = item.querySelector('.lure-weight').value;
-            
-            let sizeSub = (lSize !== 'none') ? `_{\\mathbf{${lSize}}}` : '';
+            const extraElem = item.querySelector('.lure-extra');
+            const lExtra = extraElem ? extraElem.value : '';
+
+            let sizeSub = (lSize !== 'none') ? `_{\\mathbf{${lSize}${lExtra ? ', ' + lExtra : ''}}}` : '';
             let weightSup = (lWeight) ? `^{${lWeight}}` : '';
             luresArray.push(`${lType}${sizeSub}${weightSup}`);
         });
 
-        const luresStr = luresArray.join(' \\ + \\ ');
+        // Rendu sous forme d'ensemble mathématique (champ des possibles)
+        let luresLaTeX = "";
+        if (luresArray.length === 1) {
+            luresLaTeX = luresArray[0];
+        } else {
+            luresLaTeX = `\\left\\{ \\begin{array}{l} ` + luresArray.join(' \\\\ ') + ` \\end{array} \\right.`;
+        }
 
-        // Assemblage final LaTeX Épuré
-        const latexFormula = `\\left\\{ ${canneStr} \\ + \\ ${moulinetStr} \\right\\} \\ \\longrightarrow \\ ${ligneStr} ${noeud1} ${bdl1Str}${section2Str} \\ ${fixFinal} \\ \\longrightarrow \\ ${luresStr}`;
+        // Assemblage global
+        const latexFormula = `\\left\\{ ${canneStr} \\ + \\ ${moulinetStr} \\right\\} \\ \\longrightarrow \\ ${ligneStr} ${noeud1} ${bdl1Str}${section2Str} \\ ${fixFinal} \\ \\longrightarrow \\ ${luresLaTeX}`;
 
-        // Rendu
+        // Rendu MathJax
         document.getElementById('rawLatex').innerText = latexFormula;
         const renderedDiv = document.getElementById('renderedMath');
         renderedDiv.innerHTML = `\\[ ${latexFormula} \\]`;
