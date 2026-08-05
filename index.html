@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnglerMath - Générateur & Analyser de Montages</title>
-    <!-- Moteur MathJax pour le rendu d'équations LaTeX en direct -->
+    <title>AnglerMath - Générateur de Formules Halieutiques</title>
+    <!-- Moteur MathJax pour le rendu d'équations LaTeX -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         :root {
@@ -18,6 +18,7 @@
             --danger: #ef4444;
             --warning: #eab308;
             --success: #22c55e;
+            --info-bg: #091e3a;
         }
 
         body {
@@ -107,7 +108,17 @@
             border-color: var(--accent);
         }
 
-        /* Section multi-leurres */
+        .helper-box {
+            background-color: var(--info-bg);
+            border: 1px solid #1e40af;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-top: 15px;
+            font-size: 0.88em;
+            color: #93c5fd;
+            line-height: 1.4;
+        }
+
         .lure-item {
             background-color: #0f172a;
             border: 1px dashed var(--border);
@@ -205,41 +216,6 @@
             color: #000;
         }
 
-        /* Diagnostic & Score */
-        .coherence-box {
-            background: #1e293b;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .score-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 1.05em;
-            margin-bottom: 15px;
-        }
-
-        .score-green { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid var(--success); }
-        .score-orange { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid var(--warning); }
-        .score-red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid var(--danger); }
-
-        .alert-item {
-            padding: 10px 14px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            font-size: 0.9em;
-            line-height: 1.4;
-        }
-
-        .alert-red { background: rgba(239, 68, 68, 0.12); border-left: 4px solid var(--danger); color: #fca5a5; }
-        .alert-orange { background: rgba(234, 179, 8, 0.12); border-left: 4px solid var(--warning); color: #fde047; }
-        .alert-green { background: rgba(34, 197, 94, 0.12); border-left: 4px solid var(--success); color: #86efac; }
-
         .hidden { display: none !important; }
     </style>
 </head>
@@ -248,7 +224,7 @@
 <div class="container">
     <header>
         <h1>AnglerMath 🎣</h1>
-        <p>Générateur de formalisation mathématique & Diagnostic de cohérence</p>
+        <p>Générateur de formalisation synthétique pour montages de pêche</p>
     </header>
 
     <form id="formulaForm">
@@ -271,34 +247,7 @@
             <h2>2. Canne</h2>
             <div class="grid">
                 <div class="form-group">
-                    <label for="canneBlank">Blank (Matériau)</label>
-                    <select id="canneBlank" onchange="checkCustom(this, 'canneBlankCustom')">
-                        <option value="Toray">Toray</option>
-                        <option value="T1100G">T1100G</option>
-                        <option value="Morpho">Morpho</option>
-                        <option value="Glass">Glass-Blank</option>
-                        <option value="Standard">Standard</option>
-                        <option value="Saltwater">Saltwater (Mer)</option>
-                        <option value="custom">Autre (saisie manuelle)...</option>
-                    </select>
-                    <input type="text" id="canneBlankCustom" class="custom-input hidden" placeholder="Nom du Blank">
-                </div>
-
-                <div class="form-group">
-                    <label for="canneAnneaux">Anneaux</label>
-                    <select id="canneAnneaux" onchange="checkCustom(this, 'canneAnneauxCustom')">
-                        <option value="Fuji">Fuji</option>
-                        <option value="Alconite">Alconite</option>
-                        <option value="Sic">Sic</option>
-                        <option value="Torzite">Torzite</option>
-                        <option value="Standard">Standard</option>
-                        <option value="custom">Autre (saisie manuelle)...</option>
-                    </select>
-                    <input type="text" id="canneAnneauxCustom" class="custom-input hidden" placeholder="Type d'anneaux">
-                </div>
-
-                <div class="form-group">
-                    <label for="canneAction">Action</label>
+                    <label for="canneAction">Action *</label>
                     <select id="canneAction">
                         <option value="F">Fast (F)</option>
                         <option value="XF">Extra Fast (XF)</option>
@@ -309,9 +258,8 @@
                     </select>
                 </div>
 
-                <!-- Puissances Leurres -->
                 <div class="form-group group-lancer">
-                    <label for="puiMin">Puissance Min (g)</label>
+                    <label for="puiMin">Puissance Min (g) *</label>
                     <select id="puiMin" onchange="checkCustom(this, 'puiMinCustom')">
                         <option value="0">0g</option><option value="1">1g</option><option value="2">2g</option>
                         <option value="3" selected>3g</option><option value="5">5g</option><option value="7">7g</option>
@@ -323,7 +271,7 @@
                 </div>
 
                 <div class="form-group group-lancer">
-                    <label for="puiMax">Puissance Max (g)</label>
+                    <label for="puiMax">Puissance Max (g) *</label>
                     <select id="puiMax" onchange="checkCustom(this, 'puiMaxCustom')">
                         <option value="5">5g</option><option value="7">7g</option><option value="10">10g</option>
                         <option value="15">15g</option><option value="21">21g</option><option value="28" selected>28g</option>
@@ -334,7 +282,6 @@
                     <input type="text" id="puiMaxCustom" class="custom-input hidden" placeholder="ex: 35g">
                 </div>
 
-                <!-- Soie Mouche -->
                 <div class="form-group group-mouche hidden">
                     <label for="canneSoie">Soie (#)</label>
                     <select id="canneSoie">
@@ -346,7 +293,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="canneLong">Longueur</label>
+                    <label for="canneLong">Longueur *</label>
                     <select id="canneLong" onchange="checkCustom(this, 'canneLongCustom')">
                         <option value="1.90m">1.90m</option><option value="2.10m" selected>2.10m</option>
                         <option value="2.20m">2.20m</option><option value="2.40m">2.40m</option>
@@ -357,12 +304,40 @@
                     <input type="text" id="canneLongCustom" class="custom-input hidden" placeholder="ex: 2.15m">
                 </div>
 
-                <!-- Brins -->
+                <!-- Champs optionnels (Non obligatoires dans la formule) -->
                 <div class="form-group">
-                    <label for="canneBrins">Brins</label>
+                    <label for="canneBlank">Blank (Optionnel)</label>
+                    <select id="canneBlank" onchange="checkCustom(this, 'canneBlankCustom')">
+                        <option value="none" selected>-- Non spécifié --</option>
+                        <option value="Toray">Toray</option>
+                        <option value="T1100G">T1100G</option>
+                        <option value="Morpho">Morpho</option>
+                        <option value="Glass">Glass-Blank</option>
+                        <option value="Saltwater">Saltwater</option>
+                        <option value="custom">Autre...</option>
+                    </select>
+                    <input type="text" id="canneBlankCustom" class="custom-input hidden" placeholder="Nom du Blank">
+                </div>
+
+                <div class="form-group">
+                    <label for="canneAnneaux">Anneaux (Optionnel)</label>
+                    <select id="canneAnneaux" onchange="checkCustom(this, 'canneAnneauxCustom')">
+                        <option value="none" selected>-- Non spécifié --</option>
+                        <option value="Fuji">Fuji</option>
+                        <option value="Alconite">Alconite</option>
+                        <option value="Sic">Sic</option>
+                        <option value="Torzite">Torzite</option>
+                        <option value="custom">Autre...</option>
+                    </select>
+                    <input type="text" id="canneAnneauxCustom" class="custom-input hidden" placeholder="Type d'anneaux">
+                </div>
+
+                <div class="form-group">
+                    <label for="canneBrins">Brins (Optionnel)</label>
                     <select id="canneBrins" onchange="checkCustom(this, 'canneBrinsCustom')">
+                        <option value="none" selected>-- Non spécifié --</option>
                         <option value="1">1 brin</option>
-                        <option value="2" selected>2 brins</option>
+                        <option value="2">2 brins</option>
                         <option value="3">3 brins</option>
                         <option value="4">4 brins (Voyage)</option>
                         <option value="1+1">1+1 (Talon démontable)</option>
@@ -379,7 +354,7 @@
             <h2>3. Moulinet</h2>
             <div class="grid">
                 <div class="form-group">
-                    <label for="moulinetType">Type</label>
+                    <label for="moulinetType">Type *</label>
                     <select id="moulinetType">
                         <option value="Sp">Spinning (Sp)</option>
                         <option value="Bc">Baitcasting (Bc)</option>
@@ -389,7 +364,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="moulinetTaille">Taille Bâti</label>
+                    <label for="moulinetTaille">Taille Bâti *</label>
                     <select id="moulinetTaille" onchange="checkCustom(this, 'moulinetTailleCustom')">
                         <option value="1000">1000</option><option value="2000">2000</option>
                         <option value="2500" selected>2500</option><option value="3000">3000</option>
@@ -402,37 +377,43 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="moulinetRatio">Ratio / Vitesse</label>
+                    <label for="moulinetRatio">Ratio / Vitesse *</label>
                     <select id="moulinetRatio" onchange="checkCustom(this, 'moulinetRatioCustom')">
                         <option value="Standard">Standard</option>
                         <option value="HG" selected>HG (High Gear)</option>
                         <option value="XG">XG (Extra High Gear)</option>
-                        <option value="Power">Power / PG</option>
+                        <option value="Power">Power / PG (Lent)</option>
                         <option value="custom">Autre...</option>
                     </select>
                     <input type="text" id="moulinetRatioCustom" class="custom-input hidden" placeholder="ex: 6.2:1">
                 </div>
 
                 <div class="form-group group-lancer">
-                    <label for="moulinetFrein">Frein Max (kg)</label>
+                    <label for="moulinetFrein">Frein Max (Optionnel)</label>
                     <select id="moulinetFrein" onchange="checkCustom(this, 'moulinetFreinCustom')">
+                        <option value="none" selected>-- Non affiché --</option>
                         <option value="3kg">3kg</option><option value="4kg">4kg</option>
-                        <option value="6kg" selected>6kg</option><option value="9kg">9kg</option>
+                        <option value="6kg">6kg</option><option value="9kg">9kg</option>
                         <option value="12kg">12kg</option>
                         <option value="custom">Autre...</option>
                     </select>
                     <input type="text" id="moulinetFreinCustom" class="custom-input hidden" placeholder="ex: 7kg">
                 </div>
             </div>
+
+            <!-- Conseil de remplissage & TMV suggéré -->
+            <div id="spoolAdviceBox" class="helper-box">
+                💡 <b>Conseils Moulinet & Remplissage :</b> Sélectionne la ligne principale ci-dessous pour calculer le remplissage recommandé (longueur fil + backing).
+            </div>
         </div>
 
-        <!-- 4. Ligne Principale -->
+        <!-- 4. Ligne Principale & Raccord -->
         <div class="section-card">
-            <h2>4. Ligne Principale & Raccord</h2>
+            <h2>4. Ligne Principale & Premier Raccord</h2>
             <div class="grid">
                 <div class="form-group">
-                    <label for="ligneType">Matériau Ligne</label>
-                    <select id="ligneType" onchange="toggleLigneType()">
+                    <label for="ligneType">Matériau Ligne *</label>
+                    <select id="ligneType" onchange="updateLigneUI()">
                         <option value="T">Tresse (T)</option>
                         <option value="F">Fluorocarbone (F)</option>
                         <option value="N">Nylon (N)</option>
@@ -442,25 +423,36 @@
                 </div>
 
                 <div class="form-group" id="groupPE">
-                    <label for="lignePE">Taille PE Tresse</label>
-                    <select id="lignePE" onchange="checkCustom(this, 'lignePECustom')">
-                        <!-- Généré dynamiquement -->
+                    <label for="lignePE">Taille PE Tresse *</label>
+                    <select id="lignePE" onchange="checkCustom(this, 'lignePECustom'); updateSpoolAdvice();">
+                        <!-- Généré par JS -->
                     </select>
                     <input type="text" id="lignePECustom" class="custom-input hidden" placeholder="ex: PE 0.15">
                 </div>
 
                 <div class="form-group hidden" id="groupLigneStandard">
-                    <label for="ligneParamText">Diamètre (centièmes) / Soie</label>
-                    <input type="text" id="ligneParamText" value="25">
+                    <label for="ligneParamText">Diamètre (centièmes) / Soie *</label>
+                    <select id="ligneParamText" onchange="checkCustom(this, 'ligneParamCustom'); updateSpoolAdvice();">
+                        <option value="16">16/100</option><option value="18">18/100</option>
+                        <option value="20">20/100</option><option value="22">22/100</option>
+                        <option value="25" selected>25/100</option><option value="28">28/100</option>
+                        <option value="30">30/100</option><option value="35">35/100</option>
+                        <option value="custom">Autre...</option>
+                    </select>
+                    <input type="text" id="ligneParamCustom" class="custom-input hidden" placeholder="ex: 23">
                 </div>
 
+                <!-- Nœuds nettoyés et diversifiés -->
                 <div class="form-group">
-                    <label for="noeud1">Raccord Ligne/Bas de ligne</label>
+                    <label for="noeud1">Premier Nœud de Raccord *</label>
                     <select id="noeud1">
-                        <option value="\sim_{\text{Alb}}">Nœud Albright (\sim_{Alb})</option>
-                        <option value="\sim_{\text{Pal}}">Nœud Palomar (\sim_{Pal})</option>
-                        <option value="\sim_{\text{Bou}}">Boucle dans boucle (\sim_{Bou})</option>
-                        <option value="\varnothing_{Sl}">Sleeve (\varnothing_{Sl})</option>
+                        <option value="\overset{\text{Alb}}{\sim}">Nœud Albright</option>
+                        <option value="\overset{\text{FG}}{\sim}">Nœud FG</option>
+                        <option value="\overset{\text{Pei}}{\sim}">Nœud Peixet</option>
+                        <option value="\overset{\text{Uni}}{\sim}">Nœud Uni / Grinner</option>
+                        <option value="\overset{\text{Pal}}{\sim}">Nœud Palomar</option>
+                        <option value="\overset{\text{Bou}}{\sim}">Boucle dans boucle</option>
+                        <option value="\varnothing_{\text{Sl}}">Sleeve (Sertissage)</option>
                     </select>
                 </div>
             </div>
@@ -468,36 +460,57 @@
 
         <!-- 5. Bas de Ligne -->
         <div class="section-card">
-            <h2>5. Bas de Ligne</h2>
+            <h2>5. Bas de Ligne & Avançon</h2>
             <div class="grid">
                 <div class="form-group">
-                    <label for="bdl1Mat">Matériau</label>
+                    <label for="bdl1Mat">Matériau *</label>
                     <select id="bdl1Mat">
                         <option value="F">Fluorocarbone (F)</option>
                         <option value="N">Nylon (N)</option>
                         <option value="BL">Bas de ligne dégressif (BL)</option>
                     </select>
                 </div>
+
                 <div class="form-group">
-                    <label for="bdl1Diam">Diamètre / Dégressivité (ex: 30)</label>
-                    <input type="text" id="bdl1Diam" value="30">
+                    <label for="bdl1Diam">Diamètre / Dégressivité *</label>
+                    <select id="bdl1Diam" onchange="checkCustom(this, 'bdl1DiamCustom')">
+                        <option value="16">16/100</option><option value="18">18/100</option>
+                        <option value="20">20/100</option><option value="22">22/100</option>
+                        <option value="25">25/100</option><option value="30" selected>30/100</option>
+                        <option value="35">35/100</option><option value="40">40/100</option>
+                        <option value="50">50/100</option><option value="60">60/100</option>
+                        <option value="70">70/100</option><option value="80">80/100</option>
+                        <option value="90">90/100</option><option value="100">100/100</option>
+                        <option value="45 \rightarrow 15">45 → 15 (Mouche)</option>
+                        <option value="custom">Autre...</option>
+                    </select>
+                    <input type="text" id="bdl1DiamCustom" class="custom-input hidden" placeholder="ex: 28">
                 </div>
+
                 <div class="form-group">
-                    <label for="bdl1Long">Longueur</label>
-                    <input type="text" id="bdl1Long" value="2m">
+                    <label for="bdl1Long">Longueur *</label>
+                    <select id="bdl1Long" onchange="checkCustom(this, 'bdl1LongCustom')">
+                        <option value="1.2m">1.2m</option><option value="1.5m">1.5m</option>
+                        <option value="2m" selected>2m</option><option value="2.5m">2.5m</option>
+                        <option value="3m">3m</option><option value="4.5m">4.5m</option>
+                        <option value="45cm">45cm</option><option value="50cm">50cm</option>
+                        <option value="custom">Autre...</option>
+                    </select>
+                    <input type="text" id="bdl1LongCustom" class="custom-input hidden" placeholder="ex: 1.8m">
                 </div>
             </div>
 
+            <!-- Avançon 2ème section -->
             <h3 style="font-size: 0.95em; color: var(--text-muted); margin-top: 15px;">Avançon / Section 2 (Optionnel)</h3>
             <div class="grid">
                 <div class="form-group">
                     <label for="noeud2">Raccord Avançon</label>
                     <select id="noeud2">
-                        <option value="none">Aucun (Pas d'avançon)</option>
-                        <option value="\sim_{\text{Gri}}">Nœud Grinner (\sim_{Gri})</option>
-                        <option value="\sim_{\text{Blood}}">Nœud de Sang (\sim_{Blood})</option>
-                        <option value="\sim_{\text{Chir}}">Nœud de Chirurgien (\sim_{Chir})</option>
-                        <option value="\varnothing_{Sl}">Sleeve (\varnothing_{Sl})</option>
+                        <option value="none" selected>Aucun (Pas d'avançon)</option>
+                        <option value="\overset{\text{Gri}}{\sim}">Nœud Grinner / Uni</option>
+                        <option value="\overset{\text{Blood}}{\sim}">Nœud de Sang</option>
+                        <option value="\overset{\text{Chir}}{\sim}">Nœud de Chirurgien</option>
+                        <option value="\varnothing_{\text{Sl}}">Sleeve (Sertissage)</option>
                         <option value="ER">Émerillon Rolling (ER)</option>
                     </select>
                 </div>
@@ -507,16 +520,30 @@
                         <option value="none">Aucun</option>
                         <option value="F">Fluorocarbone (F)</option>
                         <option value="N">Nylon (N)</option>
+                        <option value="St">Acier (St - Steel)</option>
+                        <option value="Ti">Titane (Ti)</option>
+                        <option value="Wg">Tungstène (Wg)</option>
                         <option value="Ind">Indicateur Bicolore (Ind)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="bdl2Diam">Diamètre Avançon (ex: 80)</label>
-                    <input type="text" id="bdl2Diam" value="80">
+                    <label for="bdl2Diam">Diamètre Avançon</label>
+                    <select id="bdl2Diam" onchange="checkCustom(this, 'bdl2DiamCustom')">
+                        <option value="40">40/100</option><option value="60">60/100</option>
+                        <option value="80" selected>80/100</option><option value="90">90/100</option>
+                        <option value="100">100/100</option>
+                        <option value="custom">Autre...</option>
+                    </select>
+                    <input type="text" id="bdl2DiamCustom" class="custom-input hidden" placeholder="ex: 75">
                 </div>
                 <div class="form-group">
                     <label for="bdl2Long">Longueur Avançon</label>
-                    <input type="text" id="bdl2Long" value="30cm">
+                    <select id="bdl2Long" onchange="checkCustom(this, 'bdl2LongCustom')">
+                        <option value="30cm" selected>30cm</option><option value="40cm">40cm</option>
+                        <option value="50cm">50cm</option>
+                        <option value="custom">Autre...</option>
+                    </select>
+                    <input type="text" id="bdl2LongCustom" class="custom-input hidden" placeholder="ex: 35cm">
                 </div>
             </div>
         </div>
@@ -526,13 +553,14 @@
             <h2>6. Attache Terminale & Leurre(s) / Mouche(s)</h2>
             <div class="grid" style="margin-bottom: 15px;">
                 <div class="form-group">
-                    <label for="fixationFinal">Attache Terminale</label>
+                    <label for="fixationFinal">Attache Terminale *</label>
                     <select id="fixationFinal">
                         <option value="A">Agrafe (A)</option>
                         <option value="AB">Anneau Brisé (AB)</option>
-                        <option value="\varnothing_{AB}">Micro-Ring (\varnothing_{AB})</option>
-                        <option value="\sim_{\text{Cui}}">Nœud Cuillère (\sim_{Cui})</option>
-                        <option value="\sim_{\text{Pen}}">Nœud Pendu (\sim_{Pen})</option>
+                        <option value="\varnothing_{\text{AB}}">Micro-Ring (\varnothing_{AB})</option>
+                        <option value="\overset{\text{Cui}}{\sim}">Nœud Cuillère</option>
+                        <option value="\overset{\text{Rap}}{\sim}">Nœud Rapala</option>
+                        <option value="\overset{\text{Pen}}{\sim}">Nœud Pendu</option>
                     </select>
                 </div>
             </div>
@@ -541,24 +569,15 @@
             <button type="button" class="btn-add" onclick="addLureInput()">+ Ajouter un leurre / mouche</button>
         </div>
 
-        <button type="button" class="btn-submit" onclick="generateFormula()">⚡ Générer & Analyser la Formule</button>
+        <button type="button" class="btn-submit" onclick="generateFormula()">⚡ Générer la Formule Synthétique</button>
     </form>
 
-    <!-- Résultat Formule -->
+    <!-- Résultat -->
     <div id="resultCard" class="result-box hidden">
         <h3 style="margin-top:0; color:var(--accent);">Votre Formule Mathématique</h3>
         <div id="renderedMath" class="result-rendered"></div>
         <div id="rawLatex" class="raw-latex"></div>
         <button class="btn-copy" onclick="copyToClipboard()">📋 Copier le LaTeX</button>
-
-        <!-- Nouveau Bloc Diagnostic de Cohérence -->
-        <div id="coherenceCard" class="coherence-box">
-            <h3 style="margin-top: 0; margin-bottom: 10px; color: var(--text-main); font-size: 1.1em;">
-                🛡️ Diagnostic de Cohérence du Montage
-            </h3>
-            <div id="scoreBadge" class="score-badge"></div>
-            <div id="alertsContainer"></div>
-        </div>
     </div>
 </div>
 
@@ -566,6 +585,7 @@
     window.onload = function() {
         populatePE();
         addLureInput("PT", "M", "12g");
+        updateSpoolAdvice();
     };
 
     function populatePE() {
@@ -581,7 +601,7 @@
         }
         let customOpt = document.createElement('option');
         customOpt.value = "custom";
-        customOpt.innerText = "Autre (saisie manuelle)...";
+        customOpt.innerText = "Autre...";
         select.appendChild(customOpt);
     }
 
@@ -604,17 +624,17 @@
             moucheGroups.forEach(g => g.classList.remove('hidden'));
             document.getElementById('moulinetType').value = 'Fly, LA';
             document.getElementById('ligneType').value = 'S';
-            toggleLigneType();
+            updateLigneUI();
         } else {
             lancerGroups.forEach(g => g.classList.remove('hidden'));
             moucheGroups.forEach(g => g.classList.add('hidden'));
             document.getElementById('moulinetType').value = 'Sp';
             document.getElementById('ligneType').value = 'T';
-            toggleLigneType();
+            updateLigneUI();
         }
     }
 
-    function toggleLigneType() {
+    function updateLigneUI() {
         const lType = document.getElementById('ligneType').value;
         const gPE = document.getElementById('groupPE');
         const gStd = document.getElementById('groupLigneStandard');
@@ -626,6 +646,38 @@
             gPE.classList.add('hidden');
             gStd.classList.remove('hidden');
         }
+        updateSpoolAdvice();
+    }
+
+    // Calculateur de garnissage & conseils TMV
+    function updateSpoolAdvice() {
+        const mTaille = getVal('moulinetTaille', 'moulinetTailleCustom');
+        const lType = document.getElementById('ligneType').value;
+        const peVal = getVal('lignePE', 'lignePECustom');
+        const ratio = getVal('moulinetRatio', 'moulinetRatioCustom');
+        const adviceBox = document.getElementById('spoolAdviceBox');
+
+        let lenLine = "130m à 150m";
+        let backingText = "Prevoir ~30-50m de backing Nylon (25/100) sous la tresse.";
+
+        if (mTaille === "1000") {
+            lenLine = "100m";
+            backingText = "Peu ou pas de backing nécessaire.";
+        } else if (parseInt(mTaille) >= 3000) {
+            lenLine = "150m à 200m";
+            backingText = "Prevoir ~60-80m de backing Nylon (30/100) pour remplir la bobine.";
+        }
+
+        let speedAdvice = "TMV standard (70-80cm/tmv) parfait pour le linéaire.";
+        if (ratio === "XG") {
+            speedAdvice = "TMV rapide (85-95cm/tmv) idéal pour Stickbait, Jerk et prospection rapide.";
+        } else if (ratio === "Power") {
+            speedAdvice = "TMV lent / puissant (60-70cm/tmv) parfait pour Crankbait et Swimbaits lourds.";
+        }
+
+        adviceBox.innerHTML = `💡 <b>Conseils Moulinet (${mTaille} - ${ratio}) :</b><br>` +
+            `• <b>Capacité optimale :</b> Enrouler <b>${lenLine}</b> de ${lType === 'T' ? peVal : 'fil principal'}. ${backingText}<br>` +
+            `• <b>Vitesse & Récupération :</b> ${speedAdvice}`;
     }
 
     let lureCount = 0;
@@ -685,216 +737,106 @@
 
     function getVal(selectId, customId) {
         const sel = document.getElementById(selectId);
-        if (sel && sel.value === 'custom') {
+        if (!sel) return '';
+        if (sel.value === 'custom' && customId) {
             return document.getElementById(customId).value;
         }
-        return sel ? sel.value : '';
-    }
-
-    // --- MOTEUR DE DIAGNOSTIC DE COHÉRENCE ---
-    function evaluateCoherence(pMin, pMax, peValue, bdlDiameters, totalLureWeight, lureTypes) {
-        let alerts = [];
-        let score = 10;
-
-        // 1. Test Masse Leurre vs Puissance Canne
-        if (totalLureWeight > 0 && pMax > 0) {
-            if (totalLureWeight < pMin) {
-                alerts.push({ 
-                    type: 'red', 
-                    text: `⚠️ <b>Leurre sous-dimensionné :</b> Le leurre (${totalLureWeight}g) est trop léger pour la canne (${pMin}-${pMax}g). La canne ne se chargera pas au lancer (perte de distance et de précision).` 
-                });
-                score -= 4;
-            } else if (totalLureWeight > pMax) {
-                alerts.push({ 
-                    type: 'red', 
-                    text: `🚨 <b>DANGER SURCHARGE :</b> La masse totale (${totalLureWeight}g) dépasse la capacité max de la canne (${pMax}g). Risque de rupture du scion au lancer !` 
-                });
-                score -= 5;
-            } else {
-                alerts.push({ 
-                    type: 'green', 
-                    text: `✅ <b>Puissance Canne/Leurre :</b> La masse de ${totalLureWeight}g est parfaitement adaptée à la plage ${pMin}-${pMax}g de votre canne.` 
-                });
-            }
-        }
-
-        // 2. Test Tresse vs Canne
-        if (peValue > 0 && pMax > 0) {
-            let targetPE = pMax / 25;
-            if (peValue > targetPE + 1.2) {
-                alerts.push({ 
-                    type: 'orange', 
-                    text: `⚠️ <b>Tresse lourde :</b> Tresse PE ${peValue} surdimensionnée pour une canne de ${pMax}g max. Perte de sensibilité et de distance.` 
-                });
-                score -= 2;
-            } else if (peValue < targetPE - 0.6) {
-                alerts.push({ 
-                    type: 'orange', 
-                    text: `⚠️ <b>Tresse très fine :</b> Tresse PE ${peValue} risquée sur une canne de ${pMax}g (attention aux casses sur les lancers appuyés).` 
-                });
-                score -= 2;
-            } else {
-                alerts.push({ 
-                    type: 'green', 
-                    text: `✅ <b>Ligne principale :</b> Le diamètre de tresse (PE ${peValue}) est bien proportionné à la canne.` 
-                });
-            }
-        }
-
-        // 3. Test Rigidité Bas de ligne vs Petit leurre
-        let maxBdlDiam = Math.max(...bdlDiameters, 0);
-        if (totalLureWeight <= 5 && totalLureWeight > 0 && maxBdlDiam > 30) {
-            alerts.push({ 
-                type: 'orange', 
-                text: `⚠️ <b>Ligne trop raide :</b> Fil de ${maxBdlDiam}/100 trop épais pour un leurre très léger (${totalLureWeight}g). La nage va être bridée.` 
-            });
-            score -= 2;
-        }
-
-        // 4. Test Dentition Brochet
-        let holdsBigLure = totalLureWeight >= 30 || lureTypes.some(t => ['JK', 'GB', 'SB', 'CB'].includes(t));
-        if (holdsBigLure && maxBdlDiam < 60) {
-            alerts.push({ 
-                type: 'red', 
-                text: `🦈 <b>RISQUE DE COUPE BROCHET :</b> Montage ciblant de gros leurres mais avec un bas de ligne inférieur à 60/100 (${maxBdlDiam}/100). Ajoutez un avançon blindé (80-100/100).` 
-            });
-            score -= 3;
-        }
-
-        if (score < 0) score = 0;
-        return { score, alerts };
+        return sel.value;
     }
 
     function generateFormula() {
         const tech = document.getElementById('technique').value;
 
-        // 1. Canne
+        // 1. Canne (Gestion intelligente des options vides)
         const cBlank = getVal('canneBlank', 'canneBlankCustom');
         const cAnneaux = getVal('canneAnneaux', 'canneAnneauxCustom');
         const cAction = document.getElementById('canneAction').value;
-        
-        let cPuis = "";
-        let minP = 0, maxP = 0;
+        const cBrins = getVal('canneBrins', 'canneBrinsCustom');
+        const cLong = getVal('canneLong', 'canneLongCustom');
 
+        let cPuis = "";
         if (tech === 'mouche') {
             cPuis = document.getElementById('canneSoie').value;
         } else {
-            minP = parseFloat(getVal('puiMin', 'puiMinCustom')) || 0;
-            maxP = parseFloat(getVal('puiMax', 'puiMaxCustom')) || 0;
+            let minP = getVal('puiMin', 'puiMinCustom');
+            let maxP = getVal('puiMax', 'puiMaxCustom');
             cPuis = `${minP}-${maxP}g`;
         }
-        
-        const cLong = getVal('canneLong', 'canneLongCustom');
-        const cBrins = getVal('canneBrins', 'canneBrinsCustom');
-        const canneStr = `C_{\\text{${cBlank}, ${cAnneaux}}}^{\\text{${cAction}, ${cPuis}}}[${cLong}^{${cBrins}}]`;
 
-        // 2. Moulinet
+        // Construction du sous-titre Canne (Blank/Anneaux) uniquement s'ils sont renseignés
+        let cMatArray = [];
+        if (cBlank && cBlank !== 'none') cMatArray.push(cBlank);
+        if (cAnneaux && cAnneaux !== 'none') cMatArray.push(cAnneaux);
+        
+        let cMatSub = cMatArray.length > 0 ? `_{\\text{${cMatArray.join(', ')}}}` : '';
+        let cBrinsSup = (cBrins && cBrins !== 'none') ? `^{${cBrins}}` : '';
+
+        const canneStr = `C${cMatSub}^{\\text{${cAction}, ${cPuis}}}[${cLong}${cBrinsSup}]`;
+
+        // 2. Moulinet (Compact)
         const mType = document.getElementById('moulinetType').value;
         const mTaille = getVal('moulinetTaille', 'moulinetTailleCustom');
         const mRatio = getVal('moulinetRatio', 'moulinetRatioCustom');
         const mFrein = getVal('moulinetFrein', 'moulinetFreinCustom');
 
+        let mFreinSub = (mFrein && mFrein !== 'none') ? `_{\\text{${mFrein}}}` : '';
+
         const moulinetStr = (tech === 'mouche') 
             ? `M_{\\text{${mType}}}^{\\text{${mTaille}}}`
-            : `M_{\\text{${mFrein}}}^{\\text{${mType}, ${mTaille}, ${mRatio}}}`;
+            : `M${mFreinSub}^{\\text{${mType}, ${mTaille}, ${mRatio}}}`;
 
         // 3. Ligne Principale
         const lType = document.getElementById('ligneType').value;
-        let lParam = "";
-        let peVal = 0;
-
-        if (lType === 'T') {
-            lParam = getVal('lignePE', 'lignePECustom');
-            let matchPE = lParam.match(/[\d\.]+/);
-            if (matchPE) peVal = parseFloat(matchPE[0]);
-        } else {
-            lParam = document.getElementById('ligneParamText').value;
-        }
+        let lParam = (lType === 'T') 
+            ? getVal('lignePE', 'lignePECustom')
+            : getVal('ligneParamText', 'ligneParamCustom');
+        
         const ligneStr = `${lType}_{\\text{${lParam}}}`;
 
-        // 4. Premier Nœud
+        // 4. Nœud 1
         const noeud1 = document.getElementById('noeud1').value;
 
-        // 5. Bas de ligne 1
+        // 5. Bas de Ligne
         const bdl1Mat = document.getElementById('bdl1Mat').value;
-        const bdl1DiamStr = document.getElementById('bdl1Diam').value;
-        const bdl1Long = document.getElementById('bdl1Long').value;
-        const bdl1Str = `${bdl1Mat}_{\\text{${bdl1Long}}}^{${bdl1DiamStr}}`;
-
-        let bdl1DiamNum = parseFloat(bdl1DiamStr) || 0;
+        const bdl1Diam = getVal('bdl1Diam', 'bdl1DiamCustom');
+        const bdl1Long = getVal('bdl1Long', 'bdl1LongCustom');
+        const bdl1Str = `${bdl1Mat}_{\\text{${bdl1Long}}}^{${bdl1Diam}}`;
 
         // 6. Avançon Optionnel
         const noeud2 = document.getElementById('noeud2').value;
         const bdl2Mat = document.getElementById('bdl2Mat').value;
-        const bdl2DiamStr = document.getElementById('bdl2Diam').value;
-        const bdl2Long = document.getElementById('bdl2Long').value;
+        const bdl2Diam = getVal('bdl2Diam', 'bdl2DiamCustom');
+        const bdl2Long = getVal('bdl2Long', 'bdl2LongCustom');
 
-        let bdl2DiamNum = 0;
         let section2Str = "";
         if (noeud2 !== "none" && bdl2Mat !== "none") {
-            const separator = (noeud2 === "ER") ? "ER" : noeud2;
-            section2Str = ` ${separator} ${bdl2Mat}_{\\text{${bdl2Long}}}^{${bdl2DiamStr}}`;
-            bdl2DiamNum = parseFloat(bdl2DiamStr) || 0;
+            section2Str = ` ${noeud2} ${bdl2Mat}_{\\text{${bdl2Long}}}^{${bdl2Diam}}`;
         }
 
         // 7. Attache terminale & Leurres
         const fixFinal = document.getElementById('fixationFinal').value;
-        
         const lureItems = document.querySelectorAll('.lure-item');
         let luresArray = [];
-        let totalLureWeight = 0;
-        let lureTypes = [];
 
         lureItems.forEach(item => {
             const lType = item.querySelector('.lure-type').value;
             const lSize = item.querySelector('.lure-size').value;
-            const lWeightStr = item.querySelector('.lure-weight').value;
+            const lWeight = item.querySelector('.lure-weight').value;
             
-            lureTypes.push(lType);
-            let matchW = lWeightStr.match(/[\d\.]+/);
-            if (matchW) totalLureWeight += parseFloat(matchW[0]);
-
             let sizeSub = (lSize !== 'none') ? `_{\\mathbf{${lSize}}}` : '';
-            let weightSup = (lWeightStr) ? `^{${lWeightStr}}` : '';
+            let weightSup = (lWeight) ? `^{${lWeight}}` : '';
             luresArray.push(`${lType}${sizeSub}${weightSup}`);
         });
 
         const luresStr = luresArray.join(' \\ + \\ ');
+
+        // Assemblage final LaTeX Épuré
         const latexFormula = `\\left\\{ ${canneStr} \\ + \\ ${moulinetStr} \\right\\} \\ \\longrightarrow \\ ${ligneStr} ${noeud1} ${bdl1Str}${section2Str} \\ ${fixFinal} \\ \\longrightarrow \\ ${luresStr}`;
 
-        // Rendu Formule
+        // Rendu
         document.getElementById('rawLatex').innerText = latexFormula;
         const renderedDiv = document.getElementById('renderedMath');
         renderedDiv.innerHTML = `\\[ ${latexFormula} \\]`;
-
-        // CALCUL DE COHÉRENCE (Seulement pour la pêche aux leurres)
-        if (tech === 'lancer') {
-            const diag = evaluateCoherence(minP, maxP, peVal, [bdl1DiamNum, bdl2DiamNum], totalLureWeight, lureTypes);
-            
-            const badgeElem = document.getElementById('scoreBadge');
-            badgeElem.innerText = `Score de Cohérence : ${diag.score} / 10`;
-
-            if (diag.score >= 8) {
-                badgeElem.className = "score-badge score-green";
-            } else if (diag.score >= 5) {
-                badgeElem.className = "score-badge score-orange";
-            } else {
-                badgeElem.className = "score-badge score-red";
-            }
-
-            const alertsContainer = document.getElementById('alertsContainer');
-            alertsContainer.innerHTML = '';
-            diag.alerts.forEach(a => {
-                let div = document.createElement('div');
-                div.className = `alert-item alert-${a.type}`;
-                div.innerHTML = a.text;
-                alertsContainer.appendChild(div);
-            });
-            document.getElementById('coherenceCard').classList.remove('hidden');
-        } else {
-            document.getElementById('coherenceCard').classList.add('hidden');
-        }
-
         document.getElementById('resultCard').classList.remove('hidden');
 
         if (window.MathJax) {
@@ -905,7 +847,7 @@
     function copyToClipboard() {
         const text = document.getElementById('rawLatex').innerText;
         navigator.clipboard.writeText(text).then(() => {
-            alert("Formule LaTeX copiée dans le presse-papier !");
+            alert("Formule LaTeX copié dans le presse-papier !");
         });
     }
 </script>
