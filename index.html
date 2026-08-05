@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnglerMath - Générateur de Formules Halieutiques</title>
+    <title>AnglerMath - Générateur & Diagnostic de Montages</title>
     <!-- Moteur MathJax pour le rendu d'équations LaTeX -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
@@ -17,6 +17,7 @@
             --border: #334155;
             --danger: #ef4444;
             --warning: #eab308;
+            --success: #22c55e;
             --info-bg: #091e3a;
         }
 
@@ -226,6 +227,41 @@
             color: #000;
         }
 
+        /* Diagnostic & Score */
+        .coherence-box {
+            background: #1e293b;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .score-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.05em;
+            margin-bottom: 15px;
+        }
+
+        .score-green { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid var(--success); }
+        .score-orange { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid var(--warning); }
+        .score-red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid var(--danger); }
+
+        .alert-item {
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .alert-red { background: rgba(239, 68, 68, 0.12); border-left: 4px solid var(--danger); color: #fca5a5; }
+        .alert-orange { background: rgba(234, 179, 8, 0.12); border-left: 4px solid var(--warning); color: #fde047; }
+        .alert-green { background: rgba(34, 197, 94, 0.12); border-left: 4px solid var(--success); color: #86efac; }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -234,7 +270,7 @@
 <div class="container">
     <header>
         <h1>AnglerMath 🎣</h1>
-        <p>Générateur de formalisation synthétique & Champ des possibles</p>
+        <p>Générateur de formalisation synthétique & Diagnostic de cohérence</p>
     </header>
 
     <form id="formulaForm">
@@ -370,7 +406,6 @@
                     </select>
                 </div>
 
-                <!-- Bâti filtré dynamiquement selon Spinning vs Casting -->
                 <div class="form-group">
                     <label for="moulinetTaille">Taille Bâti *</label>
                     <select id="moulinetTaille" onchange="checkCustom(this, 'moulinetTailleCustom'); updateSpoolAdvice();">
@@ -555,7 +590,7 @@
             </div>
         </div>
 
-        <!-- 6. Terminal & Boîte à Leurres ("Champ des possibles") -->
+        <!-- 6. Terminal & Boîte à Leurres -->
         <div class="section-card">
             <h2>6. Attache Terminale & Boîte à Leurres (Champ des Possibles)</h2>
             <div class="grid" style="margin-bottom: 15px;">
@@ -572,14 +607,13 @@
                 </div>
             </div>
 
-            <!-- Zone d'avertissement d'incohérence -->
             <div id="incoherenceWarning" class="alert-box hidden"></div>
 
             <div id="luresContainer"></div>
             <button type="button" class="btn-add" onclick="addLureInput()">+ Ajouter une option de leurre dans la boîte</button>
         </div>
 
-        <button type="button" class="btn-submit" onclick="generateFormula()">⚡ Générer la Formule Synthétique</button>
+        <button type="button" class="btn-submit" onclick="generateFormula()">⚡ Générer & Analyser la Formule</button>
     </form>
 
     <!-- Résultat -->
@@ -588,6 +622,15 @@
         <div id="renderedMath" class="result-rendered"></div>
         <div id="rawLatex" class="raw-latex"></div>
         <button class="btn-copy" onclick="copyToClipboard()">📋 Copier le LaTeX</button>
+
+        <!-- Bloc Diagnostic de Cohérence -->
+        <div id="coherenceCard" class="coherence-box">
+            <h3 style="margin-top: 0; margin-bottom: 10px; color: var(--text-main); font-size: 1.1em;">
+                🛡️ Diagnostic de Cohérence du Montage
+            </h3>
+            <div id="scoreBadge" class="score-badge"></div>
+            <div id="alertsContainer"></div>
+        </div>
     </div>
 </div>
 
@@ -615,7 +658,6 @@
         select.appendChild(customOpt);
     }
 
-    // Filtrage dynamique des bâti de moulinets (Spinning vs Casting)
     function updateReelSizes() {
         const mType = document.getElementById('moulinetType').value;
         const select = document.getElementById('moulinetTaille');
@@ -736,7 +778,6 @@
             `• <b>Vitesse :</b> ${speedAdvice}`;
     }
 
-    // Gestion dynamique des leurres + sous-options (Profondeur / Montage)
     let lureCount = 0;
     function addLureInput(typeDef = "MN", sizeDef = "M", weightDef = "12g") {
         lureCount++;
@@ -778,10 +819,7 @@
                     <label>Poids / Détails</label>
                     <input type="text" class="lure-weight" value="${weightDef}" placeholder="ex: 15g">
                 </div>
-                <!-- Paramètre spécifique (Profondeur ou Montage) -->
-                <div class="form-group lure-sub-param" id="lure_sub_${lureCount}">
-                    <!-- Généré dynamiquement -->
-                </div>
+                <div class="form-group lure-sub-param" id="lure_sub_${lureCount}"></div>
             </div>
         `;
 
@@ -827,7 +865,6 @@
         checkIncoherences();
     }
 
-    // Vérification automatique des incohérences (ex: Agrafe sur Spinnerbait)
     function checkIncoherences() {
         const attache = document.getElementById('fixationFinal').value;
         const lureTypes = Array.from(document.querySelectorAll('.lure-type')).map(s => s.value);
@@ -850,6 +887,85 @@
         return sel.value;
     }
 
+    // --- MOTEUR DE DIAGNOSTIC DE COHÉRENCE ---
+    function evaluateCoherence(pMin, pMax, peValue, bdlDiameters, lureWeights, lureTypes) {
+        let alerts = [];
+        let score = 10;
+
+        let minWeight = Math.min(...lureWeights);
+        let maxWeight = Math.max(...lureWeights);
+
+        // 1. Test Masse Leurres vs Puissance Canne
+        if (lureWeights.length > 0 && pMax > 0) {
+            if (minWeight < pMin && minWeight > 0) {
+                alerts.push({ 
+                    type: 'red', 
+                    text: `⚠️ <b>Option sous-dimensionnée :</b> Un des leurres de la boîte (${minWeight}g) est trop léger pour la plage de la canne (${pMin}-${pMax}g). Perte de sensations.` 
+                });
+                score -= 3;
+            }
+            if (maxWeight > pMax) {
+                alerts.push({ 
+                    type: 'red', 
+                    text: `🚨 <b>DANGER SURCHARGE :</b> Un des leurres (${maxWeight}g) dépasse la puissance max admissible par la canne (${pMax}g). Risque de casse du scion au lancer !` 
+                });
+                score -= 5;
+            }
+            if (minWeight >= pMin && maxWeight <= pMax) {
+                alerts.push({ 
+                    type: 'green', 
+                    text: `✅ <b>Plage de Puissance :</b> Tous les leurres choisis (${minWeight}g à ${maxWeight}g) entrent parfaitement dans la plage de lancer de la canne (${pMin}-${pMax}g).` 
+                });
+            }
+        }
+
+        // 2. Test Tresse PE vs Puissance Canne
+        if (peValue > 0 && pMax > 0) {
+            let targetPE = pMax / 25;
+            if (peValue > targetPE + 1.2) {
+                alerts.push({ 
+                    type: 'orange', 
+                    text: `⚠️ <b>Tresse trop épaisse :</b> Tresse PE ${peValue} surdimensionnée pour une canne de ${pMax}g max. Perte de sensibilité et de distance.` 
+                });
+                score -= 2;
+            } else if (peValue < targetPE - 0.6) {
+                alerts.push({ 
+                    type: 'orange', 
+                    text: `⚠️ <b>Tresse très fine :</b> Tresse PE ${peValue} risquée sur une canne de ${pMax}g (attention aux perruques et casses sur lancers appuyés).` 
+                });
+                score -= 2;
+            } else {
+                alerts.push({ 
+                    type: 'green', 
+                    text: `✅ <b>Ligne principale :</b> Le diamètre de tresse (PE ${peValue}) est équilibré par rapport à la canne.` 
+                });
+            }
+        }
+
+        // 3. Test Rigidité Bas de ligne vs Petit leurre
+        let maxBdlDiam = Math.max(...bdlDiameters, 0);
+        if (minWeight <= 5 && minWeight > 0 && maxBdlDiam > 30) {
+            alerts.push({ 
+                type: 'orange', 
+                text: `⚠️ <b>Ligne trop raide :</b> Bas de ligne de ${maxBdlDiam}/100 trop épais pour les petits leurres (${minWeight}g). La nage va être bridée.` 
+            });
+            score -= 2;
+        }
+
+        // 4. Test Dentition Brochet
+        let holdsBigLure = maxWeight >= 30 || lureTypes.some(t => ['JK', 'GB', 'SB', 'CB', 'SP'].includes(t));
+        if (holdsBigLure && maxBdlDiam < 60) {
+            alerts.push({ 
+                type: 'red', 
+                text: `🦈 <b>RISQUE DE COUPE BROCHET :</b> Montage ciblant de gros leurres mais avec un bas de ligne de ${maxBdlDiam}/100 (< 60/100). Ajoutez un avançon blindé (80-100/100).` 
+            });
+            score -= 3;
+        }
+
+        if (score < 0) score = 0;
+        return { score, alerts };
+    }
+
     function generateFormula() {
         const tech = document.getElementById('technique').value;
 
@@ -860,9 +976,16 @@
         const cBrins = getVal('canneBrins', 'canneBrinsCustom');
         const cLong = getVal('canneLong', 'canneLongCustom');
 
-        let cPuis = (tech === 'mouche') 
-            ? document.getElementById('canneSoie').value 
-            : `${getVal('puiMin', 'puiMinCustom')}-${getVal('puiMax', 'puiMaxCustom')}g`;
+        let minP = 0, maxP = 0;
+        let cPuis = "";
+
+        if (tech === 'mouche') {
+            cPuis = document.getElementById('canneSoie').value;
+        } else {
+            minP = parseFloat(getVal('puiMin', 'puiMinCustom')) || 0;
+            maxP = parseFloat(getVal('puiMax', 'puiMaxCustom')) || 0;
+            cPuis = `${minP}-${maxP}g`;
+        }
 
         let cMatArray = [];
         if (cBlank && cBlank !== 'none') cMatArray.push(cBlank);
@@ -887,10 +1010,17 @@
 
         // 3. Ligne Principale
         const lType = document.getElementById('ligneType').value;
-        let lParam = (lType === 'T') 
-            ? getVal('lignePE', 'lignePECustom')
-            : getVal('ligneParamText', 'ligneParamCustom');
-        
+        let lParam = "";
+        let peVal = 0;
+
+        if (lType === 'T') {
+            lParam = getVal('lignePE', 'lignePECustom');
+            let matchPE = lParam.match(/[\d\.]+/);
+            if (matchPE) peVal = parseFloat(matchPE[0]);
+        } else {
+            lParam = getVal('ligneParamText', 'ligneParamCustom');
+        }
+
         const ligneStr = `${lType}_{\\text{${lParam}}}`;
         const noeud1 = document.getElementById('noeud1').value;
 
@@ -899,9 +1029,11 @@
         const bdl1Diam = getVal('bdl1Diam', 'bdl1DiamCustom');
         const bdl1Long = getVal('bdl1Long', 'bdl1LongCustom');
         let bdl1Str = `${bdl1Mat}_{\\text{${bdl1Long}}}^{${bdl1Diam}}`;
+        let bdl1DiamNum = parseFloat(bdl1Diam) || 0;
 
         const montageType = document.getElementById('montageType').value;
         let section2Str = "";
+        let bdl2DiamNum = 0;
 
         if (montageType === 'dropshot') {
             const dsP = document.getElementById('dsPlomb').value;
@@ -915,13 +1047,16 @@
 
             if (noeud2 !== "none" && bdl2Mat !== "none") {
                 section2Str = ` ${noeud2} ${bdl2Mat}_{\\text{${bdl2Long}}}^{${bdl2Diam}}`;
+                bdl2DiamNum = parseFloat(bdl2Diam) || 0;
             }
         }
 
-        // 5. Attache & Champ des Possibles (Accolade verticale des Leurres)
+        // 5. Attache & Champ des Possibles
         const fixFinal = document.getElementById('fixationFinal').value;
         const lureItems = document.querySelectorAll('.lure-item');
         let luresArray = [];
+        let lureWeights = [];
+        let lureTypes = [];
 
         lureItems.forEach(item => {
             const lType = item.querySelector('.lure-type').value;
@@ -930,26 +1065,55 @@
             const extraElem = item.querySelector('.lure-extra');
             const lExtra = extraElem ? extraElem.value : '';
 
+            lureTypes.push(lType);
+            let matchW = lWeight.match(/[\d\.]+/);
+            if (matchW) lureWeights.push(parseFloat(matchW[0]));
+
             let sizeSub = (lSize !== 'none') ? `_{\\mathbf{${lSize}${lExtra ? ', ' + lExtra : ''}}}` : '';
             let weightSup = (lWeight) ? `^{${lWeight}}` : '';
             luresArray.push(`${lType}${sizeSub}${weightSup}`);
         });
 
-        // Rendu sous forme d'ensemble mathématique (champ des possibles)
-        let luresLaTeX = "";
-        if (luresArray.length === 1) {
-            luresLaTeX = luresArray[0];
-        } else {
-            luresLaTeX = `\\left\\{ \\begin{array}{l} ` + luresArray.join(' \\\\ ') + ` \\end{array} \\right.`;
-        }
+        let luresLaTeX = (luresArray.length === 1) 
+            ? luresArray[0]
+            : `\\left\\{ \\begin{array}{l} ` + luresArray.join(' \\\\ ') + ` \\end{array} \\right.`;
 
-        // Assemblage global
+        // Assemblage global LaTeX
         const latexFormula = `\\left\\{ ${canneStr} \\ + \\ ${moulinetStr} \\right\\} \\ \\longrightarrow \\ ${ligneStr} ${noeud1} ${bdl1Str}${section2Str} \\ ${fixFinal} \\ \\longrightarrow \\ ${luresLaTeX}`;
 
-        // Rendu MathJax
+        // Rendu LaTeX
         document.getElementById('rawLatex').innerText = latexFormula;
         const renderedDiv = document.getElementById('renderedMath');
         renderedDiv.innerHTML = `\\[ ${latexFormula} \\]`;
+
+        // EXECUTION DE L'ANALYSE DE COHÉRENCE
+        if (tech === 'lancer') {
+            const diag = evaluateCoherence(minP, maxP, peVal, [bdl1DiamNum, bdl2DiamNum], lureWeights, lureTypes);
+            
+            const badgeElem = document.getElementById('scoreBadge');
+            badgeElem.innerText = `Score de Cohérence : ${diag.score} / 10`;
+
+            if (diag.score >= 8) {
+                badgeElem.className = "score-badge score-green";
+            } else if (diag.score >= 5) {
+                badgeElem.className = "score-badge score-orange";
+            } else {
+                badgeElem.className = "score-badge score-red";
+            }
+
+            const alertsContainer = document.getElementById('alertsContainer');
+            alertsContainer.innerHTML = '';
+            diag.alerts.forEach(a => {
+                let div = document.createElement('div');
+                div.className = `alert-item alert-${a.type}`;
+                div.innerHTML = a.text;
+                alertsContainer.appendChild(div);
+            });
+            document.getElementById('coherenceCard').classList.remove('hidden');
+        } else {
+            document.getElementById('coherenceCard').classList.add('hidden');
+        }
+
         document.getElementById('resultCard').classList.remove('hidden');
 
         if (window.MathJax) {
