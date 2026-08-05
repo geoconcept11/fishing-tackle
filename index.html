@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnglerMath - Générateur de Formules Halieutiques</title>
+    <!-- Chargement de MathJax pour le rendu d'équations LaTeX en direct 
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>-->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #06b6d4;
+            --accent-hover: #0891b2;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: var(--accent);
+            margin-bottom: 5px;
+            font-size: 2em;
+        }
+
+        header p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .section-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .section-card h2 {
+            font-size: 1.2em;
+            color: var(--accent);
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.85em;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        select, input {
+            background-color: #0f172a;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-submit {
+            background-color: var(--accent);
+            color: #000;
+            font-weight: bold;
+            font-size: 1.1em;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--accent-hover);
+            color: #fff;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.99);
+        }
+
+        .result-box {
+            background: #090d16;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .result-rendered {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        .raw-latex {
+            background: #1e293b;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85em;
+            color: #a5f3fc;
+            word-break: break-all;
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        .btn-copy {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .btn-copy:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>AnglerMath 🎣</h1>
+        <p>Générateur de formalisation mathématique pour ensembles de pêche</p>
+    </header>
+
+    <form id="formulaForm">
+        <!-- 0. Technique -->
+        <div class="section-card">
+            <h2>1. Technique de Pêche</h2>
+            <div class="grid">
+                <div class="form-group">
+                    <label for="technique">Discipline</label>
+                    <select id="technique" onchange="toggleTechnique()">
+                        <option value="lancer">Pêche aux Leurres (Spinning / Casting)</option>
+                        <option value="mouche">Pêche à la Mouche (Fly Fishing)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. Canne & Moulinet -->
+        <div class="section-card">
+            <h2>2. Canne & Moulinet</h2>
+            <div class="grid">
+                <!-- Canne -->
+                <div class="form-group">
+                    <label for="canneBlank">Blank (Matériau)</label>
+                    <select id="canneBlank">
+                        <option value="Toray">Toray</option>
+                        <option value="T1100G">T1100G</option>
+                        <option value="Morpho">Morpho</option>
+                        <option value="Glass">Glass-Blank</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Saltwater">Saltwater (Mer)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="canneAnneaux">Type d'Anneaux</label>
+                    <select id="canneAnneaux">
+                        <option value="Fuji">Fuji</option>
+                        <option value="Alconite">Alconite</option>
+                        <option value="Sic">Sic</option>
+                        <option value="Torzite">Torzite</option>
+                        <option value="Standard">Standard</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="canneAction">Action Canne</label>
+                    <select id="canneAction">
+                        <option value="F">Fast (F)</option>
+                        <option value="XF">Extra Fast (XF)</option>
+                        <option value="Reg-Fast">Regular-Fast</option>
+                        <option value="Regular">Regular</option>
+                        <option value="Flex-Tip">Flex-Tip</option>
+                        <option value="Med-Fast">Medium-Fast</option>
+                    </select>
+                </div>
+                <div class="form-group" id="groupPuissanceLancer">
+                    <label for="cannePuissance">Puissance (Grammes)</label>
+                    <input type="text" id="cannePuissance" value="7-28g">
+                </div>
+                <div class="form-group hidden" id="groupSoieCanne">
+                    <label for="canneSoie">Puissance Soie (#)</label>
+                    <input type="text" id="canneSoie" value="#4">
+                </div>
+                <div class="form-group">
+                    <label for="canneLongueur">Longueur & Brins</label>
+                    <input type="text" id="canneLongueur" value="2.10m^2">
+                </div>
+
+                <!-- Moulinet -->
+                <div class="form-group">
+                    <label for="moulinetType">Type Moulinet</label>
+                    <select id="moulinetType">
+                        <option value="Sp">Spinning (Sp)</option>
+                        <option value="Bc">Baitcasting (Bc)</option>
+                        <option value="Fly, LA">Mouche Large Arbor (Fly, LA)</option>
+                        <option value="Fly, Semi-Auto">Mouche Semi-Auto</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="moulinetTaille">Taille / Ratio</label>
+                    <input type="text" id="moulinetTaille" value="2500, HG">
+                </div>
+                <div class="form-group" id="groupMoulinetFrein">
+                    <label for="moulinetFrein">Frein Max (kg)</label>
+                    <input type="text" id="moulinetFrein" value="6kg">
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Ligne Principale & Raccord -->
+        <div class="section-card">
+            <h2>3. Ligne Principale & Premier Raccord</h2>
+            <div class="grid">
+                <div class="form-group">
+                    <label for="ligneType">Type de Ligne</label>
+                    <select id="ligneType">
+                        <option value="T">Tresse (T)</option>
+                        <option value="F">Fluorocarbone (F)</option>
+                        <option value="N">Nylon (N)</option>
+                        <option value="S">Soie Classique (S)</option>
+                        <option value="ST">Soie Euro Nymphing (ST)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ligneParam">Taille / Puissance</label>
+                    <input type="text" id="ligneParam" value="PE 1.0">
+                </div>
+                <div class="form-group">
+                    <label for="noeud1">Premier Nœud de Raccord</label>
+                    <select id="noeud1">
+                        <option value="\sim_{\text{Alb}}">Nœud Albright (\sim_{Alb})</option>
+                        <option value="\sim_{\text{Pal}}">Nœud Palomar (\sim_{Pal})</option>
+                        <option value="\sim_{\text{Bou}}">Boucle dans boucle (\sim_{Bou})</option>
+                        <option value="\varnothing_{Sl}">Sleeve (\varnothing_{Sl})</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Bas de ligne & Avançon -->
+        <div class="section-card">
+            <h2>4. Bas de Ligne (Section 1)</h2>
+            <div class="grid">
+                <div class="form-group">
+                    <label for="bdl1Mat">Matériau</label>
+                    <select id="bdl1Mat">
+                        <option value="F">Fluorocarbone (F)</option>
+                        <option value="N">Nylon (N)</option>
+                        <option value="BL">Bas de ligne dégressif (BL)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bdl1Diam">Diamètre / Dégressivité</label>
+                    <input type="text" id="bdl1Diam" value="30">
+                </div>
+                <div class="form-group">
+                    <label for="bdl1Long">Longueur</label>
+                    <input type="text" id="bdl1Long" value="2m">
+                </div>
+            </div>
+
+            <!-- Option Avançon 2ème section -->
+            <h3 style="font-size: 1em; color: var(--text-muted); margin-top: 15px;">Avançon / Terminal (Optionnel)</h3>
+            <div class="grid">
+                <div class="form-group">
+                    <label for="noeud2">Deuxième Raccord / Intermédiaire</label>
+                    <select id="noeud2">
+                        <option value="none">Aucun (Liaison directe)</option>
+                        <option value="\sim_{\text{Gri}}">Nœud Grinner (\sim_{Gri})</option>
+                        <option value="\sim_{\text{Blood}}">Nœud de Sang (\sim_{Blood})</option>
+                        <option value="\sim_{\text{Chir}}">Nœud de Chirurgien (\sim_{Chir})</option>
+                        <option value="\varnothing_{Sl}">Sleeve (\varnothing_{Sl})</option>
+                        <option value="ER">Émerillon Rolling (ER)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bdl2Mat">Matériau Avançon</label>
+                    <select id="bdl2Mat">
+                        <option value="none">Aucun</option>
+                        <option value="F">Fluorocarbone (F)</option>
+                        <option value="N">Nylon (N)</option>
+                        <option value="Ind">Indicateur Bicolore (Ind)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bdl2Diam">Diamètre Avançon</label>
+                    <input type="text" id="bdl2Diam" value="80">
+                </div>
+                <div class="form-group">
+                    <label for="bdl2Long">Longueur Avançon</label>
+                    <input type="text" id="bdl2Long" value="30cm">
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Terminal & Leurre / Mouche -->
+        <div class="section-card">
+            <h2>5. Fixation & Leurre / Mouche</h2>
+            <div class="grid">
+                <div class="form-group">
+                    <label for="fixationFinal">Attache Terminale</label>
+                    <select id="fixationFinal">
+                        <option value="A">Agrafe (A)</option>
+                        <option value="AB">Anneau Brisé (AB)</option>
+                        <option value="\varnothing_{AB}">Micro-Ring (\varnothing_{AB})</option>
+                        <option value="\sim_{\text{Cui}}">Nœud Cuillère (\sim_{Cui})</option>
+                        <option value="\sim_{\text{Pen}}">Nœud Pendu (\sim_{Pen})</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="leurreCode">Nom / Code Leurre ou Mouche</label>
+                    <input type="text" id="leurreCode" value="PT_{\mathbf{M}}^{22\text{g}}">
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn-submit" onclick="generateFormula()">⚡ Générer la Formule</button>
+    </form>
+
+    <!-- Résultat -->
+    <div id="resultCard" class="result-box hidden">
+        <h3 style="margin-top:0; color:var(--accent);">Votre Formule Mathématique</h3>
+        <div id="renderedMath" class="result-rendered"></div>
+        <div id="rawLatex" class="raw-latex"></div>
+        <button class="btn-copy" onclick="copyToClipboard()">📋 Copier le LaTeX</button>
+    </div>
+</div>
+
+<script>
+    function toggleTechnique() {
+        const tech = document.getElementById('technique').value;
+        const pLancer = document.getElementById('groupPuissanceLancer');
+        const sCanne = document.getElementById('groupSoieCanne');
+        const fMoulinet = document.getElementById('groupMoulinetFrein');
+
+        if (tech === 'mouche') {
+            pLancer.classList.add('hidden');
+            sCanne.classList.remove('hidden');
+            fMoulinet.classList.add('hidden');
+            
+            // Valeurs par défaut pour la mouche
+            document.getElementById('moulinetType').value = 'Fly, LA';
+            document.getElementById('moulinetTaille').value = '#3/4';
+            document.getElementById('ligneType').value = 'S';
+            document.getElementById('ligneParam').value = 'WF\#4';
+            document.getElementById('noeud1').value = '\\sim_{\\text{Bou}}';
+            document.getElementById('bdl1Mat').value = 'BL';
+            document.getElementById('bdl1Diam').value = '45 \\rightarrow 15';
+            document.getElementById('bdl1Long').value = '4.5m';
+            document.getElementById('fixationFinal').value = '\\sim_{\\text{Pen}}';
+            document.getElementById('leurreCode').value = 'Mch';
+        } else {
+            pLancer.classList.remove('hidden');
+            sCanne.classList.add('hidden');
+            fMoulinet.classList.remove('hidden');
+
+            // Valeurs par défaut pour le leurre
+            document.getElementById('moulinetType').value = 'Sp';
+            document.getElementById('moulinetTaille').value = '2500, HG';
+            document.getElementById('ligneType').value = 'T';
+            document.getElementById('ligneParam').value = 'PE 1.0';
+            document.getElementById('noeud1').value = '\\sim_{\\text{Alb}}';
+            document.getElementById('bdl1Mat').value = 'F';
+            document.getElementById('bdl1Diam').value = '30';
+            document.getElementById('bdl1Long').value = '2m';
+            document.getElementById('fixationFinal').value = 'A';
+            document.getElementById('leurreCode').value = 'MN_{\\mathbf{M}}^{12\\text{g}}';
+        }
+    }
+
+    function generateFormula() {
+        const tech = document.getElementById('technique').value;
+
+        // 1. Canne
+        const cBlank = document.getElementById('canneBlank').value;
+        const cAnneaux = document.getElementById('canneAnneaux').value;
+        const cAction = document.getElementById('canneAction').value;
+        const cPuis = (tech === 'mouche') 
+            ? document.getElementById('canneSoie').value 
+            : document.getElementById('cannePuissance').value;
+        const cLong = document.getElementById('canneLongueur').value;
+
+        const canneStr = `C_{\\text{${cBlank}, ${cAnneaux}}}^{\\text{${cAction}, ${cPuis}}}[${cLong}]`;
+
+        // 2. Moulinet
+        const mType = document.getElementById('moulinetType').value;
+        const mTaille = document.getElementById('moulinetTaille').value;
+        const mFrein = document.getElementById('moulinetFrein').value;
+
+        const moulinetStr = (tech === 'mouche') 
+            ? `M_{\\text{${mType}}}^{\\text{${mTaille}}}`
+            : `M_{\\text{${mFrein}}}^{\\text{${mType}, ${mTaille}}}`;
+
+        // 3. Ligne Principale
+        const lType = document.getElementById('ligneType').value;
+        const lParam = document.getElementById('ligneParam').value;
+        const ligneStr = `${lType}_{\\text{${lParam}}}`;
+
+        // 4. Premier Nœud
+        const noeud1 = document.getElementById('noeud1').value;
+
+        // 5. Bas de ligne 1
+        const bdl1Mat = document.getElementById('bdl1Mat').value;
+        const bdl1Diam = document.getElementById('bdl1Diam').value;
+        const bdl1Long = document.getElementById('bdl1Long').value;
+        const bdl1Str = `${bdl1Mat}_{\\text{${bdl1Long}}}^{${bdl1Diam}}`;
+
+        // 6. Avançon / Section 2 (Optionnel)
+        const noeud2 = document.getElementById('noeud2').value;
+        const bdl2Mat = document.getElementById('bdl2Mat').value;
+        const bdl2Diam = document.getElementById('bdl2Diam').value;
+        const bdl2Long = document.getElementById('bdl2Long').value;
+
+        let section2Str = "";
+        if (noeud2 !== "none" && bdl2Mat !== "none") {
+            const separator = (noeud2 === "ER") ? "ER" : noeud2;
+            section2Str = ` ${separator} ${bdl2Mat}_{\\text{${bdl2Long}}}^{${bdl2Diam}}`;
+        }
+
+        // 7. Attache terminale & Leurre
+        const fixFinal = document.getElementById('fixationFinal').value;
+        const leurre = document.getElementById('leurreCode').value;
+
+        // Assemblage global LaTeX
+        const latexFormula = `\\left\\{ ${canneStr} \\ + \\ ${moulinetStr} \\right\\} \\ \\longrightarrow \\ ${ligneStr} ${noeud1} ${bdl1Str}${section2Str} \\ ${fixFinal} \\ \\longrightarrow \\ ${leurre}`;
+
+        // Affichage des résultats
+        document.getElementById('rawLatex').innerText = latexFormula;
+        
+        const renderedDiv = document.getElementById('renderedMath');
+        renderedDiv.innerHTML = `\\[ ${latexFormula} \\]`;
+
+        document.getElementById('resultCard').classList.remove('hidden');
+
+        // Déclencher MathJax pour compiler la formule visuelle
+        if (window.MathJax) {
+            MathJax.typesetPromise([renderedDiv]);
+        }
+    }
+
+    function copyToClipboard() {
+        const text = document.getElementById('rawLatex').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Formule LaTeX copiée dans le presse-papier !");
+        });
+    }
+</script>
+
+</body>
+</html>
