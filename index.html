@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnglerMath - Générateur & Diagnostic de Montages</title>
+    <title>AnglerMath - Générateur & diagnostic de montages</title>
     <!-- Moteur MathJax pour le rendu d'équations LaTeX -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
@@ -79,6 +79,11 @@
         .form-group {
             display: flex;
             flex-direction: column;
+        }
+
+        .unit-group {
+            display: flex;
+            gap: 6px;
         }
 
         label {
@@ -261,7 +266,6 @@
         .alert-orange { background: rgba(234, 179, 8, 0.12); border-left: 4px solid var(--warning); color: #fde047; }
         .alert-green { background: rgba(34, 197, 94, 0.12); border-left: 4px solid var(--success); color: #86efac; }
 
-        /* Styles Graphique SVG */
         .chart-container {
             width: 100%;
             background: #0f172a;
@@ -291,7 +295,7 @@
                 <div class="form-group">
                     <label>Technique</label>
                     <select id="technique" disabled>
-                        <option value="lancer" selected>Pêche aux Leurres (Spinning / Casting)</option>
+                        <option value="lancer" selected>Pêche aux leurres (Spinning / Casting)</option>
                     </select>
                 </div>
             </div>
@@ -302,21 +306,30 @@
             <h2>2. Canne</h2>
             <div class="grid">
                 <div class="form-group">
-                    <label for="canneLong">Longueur (m / ft) *</label>
-                    <select id="canneLong" onchange="checkCustom(this, 'canneLongCustom')">
-                        <option value="1.90m">1.90m</option><option value="2.10m" selected>2.10m</option>
-                        <option value="2.20m">2.20m</option><option value="2.40m">2.40m</option>
-                        <option value="2.50m">2.50m</option><option value="6.6ft">6.6ft</option>
-                        <option value="7ft">7ft</option>
-                        <option value="custom">Autre...</option>
-                    </select>
-                    <input type="text" id="canneLongCustom" class="custom-input hidden" placeholder="ex: 2.15m">
+                    <label for="canneLong">Longueur *</label>
+                    <div class="unit-group">
+                        <select id="canneLong" onchange="checkCustom(this, 'canneLongCustom')" style="flex:1;">
+                            <option value="1.90">1.90</option>
+                            <option value="2.10" selected>2.10</option>
+                            <option value="2.20">2.20</option>
+                            <option value="2.40">2.40</option>
+                            <option value="2.50">2.50</option>
+                            <option value="6.6">6.6</option>
+                            <option value="7">7</option>
+                            <option value="custom">Autre...</option>
+                        </select>
+                        <select id="canneLongUnit" style="width: 60px;">
+                            <option value="m">m</option>
+                            <option value="ft">ft</option>
+                        </select>
+                    </div>
+                    <input type="text" id="canneLongCustom" class="custom-input hidden" placeholder="ex: 2.15">
                 </div>
 
                 <div class="form-group">
-                    <label for="canneAction">Action (Optionnelle)</label>
+                    <label for="canneAction">Action</label>
                     <select id="canneAction">
-                        <option value="none" selected>-- Aucune --</option>
+                        <option value="none" selected>--</option>
                         <option value="F">Fast (F)</option>
                         <option value="XF">Extra Fast (XF)</option>
                         <option value="Reg-Fast">Regular-Fast</option>
@@ -326,7 +339,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="puiMin">Puissance Min (g) *</label>
+                    <label for="puiMin">Puissance min (g) *</label>
                     <select id="puiMin" onchange="checkCustom(this, 'puiMinCustom')">
                         <option value="0">0</option><option value="1">1</option><option value="2">2</option>
                         <option value="3" selected>3</option><option value="5">5</option><option value="7">7</option>
@@ -338,7 +351,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="puiMax">Puissance Max (g) *</label>
+                    <label for="puiMax">Puissance max (g) *</label>
                     <select id="puiMax" onchange="checkCustom(this, 'puiMaxCustom')">
                         <option value="5">5</option><option value="7">7</option><option value="10">10</option>
                         <option value="15">15</option><option value="21">21</option><option value="28" selected>28</option>
@@ -350,9 +363,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="canneBrins">Brins (Optionnel)</label>
+                    <label for="canneBrins">Brins</label>
                     <select id="canneBrins" onchange="checkCustom(this, 'canneBrinsCustom')">
-                        <option value="none" selected>-- Aucun --</option>
+                        <option value="none" selected>--</option>
                         <option value="1">1 brin</option>
                         <option value="2">2 brins</option>
                         <option value="3">3 brins</option>
@@ -365,16 +378,16 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="canneBlank">Blank (Optionnel)</label>
+                    <label for="canneBlank">Blank</label>
                     <select id="canneBlank" onchange="checkCustom(this, 'canneBlankCustom')">
-                        <option value="none" selected>-- Non spécifié --</option>
+                        <option value="none" selected>--</option>
                         <option value="Toray">Toray</option>
                         <option value="T1100G">T1100G</option>
                         <option value="Morpho">Morpho</option>
                         <option value="Glass">Glass-Blank</option>
                         <option value="custom">Autre...</option>
                     </select>
-                    <input type="text" id="canneBlankCustom" class="custom-input hidden" placeholder="Nom du Blank">
+                    <input type="text" id="canneBlankCustom" class="custom-input hidden" placeholder="Nom du blank">
                 </div>
             </div>
         </div>
@@ -392,7 +405,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="moulinetTaille">Taille Bâti *</label>
+                    <label for="moulinetTaille">Taille bâti *</label>
                     <select id="moulinetTaille" onchange="checkCustom(this, 'moulinetTailleCustom'); updateSpoolAdvice();">
                         <!-- Rempli dynamiquement -->
                     </select>
@@ -402,7 +415,7 @@
                 <div class="form-group">
                     <label for="moulinetRatio">Ratio / Vitesse *</label>
                     <select id="moulinetRatio" onchange="checkCustom(this, 'moulinetRatioCustom'); updateSpoolAdvice();">
-                        <option value="none">Normal (Standard)</option>
+                        <option value="Standard">Normal (Standard)</option>
                         <option value="HG" selected>HG (High Gear)</option>
                         <option value="XG">XG (Extra High Gear)</option>
                         <option value="Power">Power / PG (Lent)</option>
@@ -413,16 +426,16 @@
             </div>
 
             <div id="spoolAdviceBox" class="helper-box">
-                💡 <b>Conseils Moulinet & Remplissage :</b> Mise à jour...
+                💡 <b>Conseils moulinet & remplissage :</b> Mise à jour...
             </div>
         </div>
 
-        <!-- 4. Ligne Principale -->
+        <!-- 4. Ligne principale -->
         <div class="section-card">
-            <h2>4. Ligne Principale & Premier Raccord</h2>
+            <h2>4. Ligne principale & premier raccord</h2>
             <div class="grid">
                 <div class="form-group">
-                    <label for="ligneType">Matériau Ligne *</label>
+                    <label for="ligneType">Matériau ligne *</label>
                     <select id="ligneType" onchange="updateLigneUI()">
                         <option value="T">Tresse (T)</option>
                         <option value="F">Fluorocarbone (F)</option>
@@ -431,7 +444,7 @@
                 </div>
 
                 <div class="form-group" id="groupPE">
-                    <label for="lignePE">Taille PE Tresse *</label>
+                    <label for="lignePE">Taille PE tresse *</label>
                     <select id="lignePE" onchange="checkCustom(this, 'lignePECustom'); updateSpoolAdvice();">
                         <!-- Généré par JS -->
                     </select>
@@ -439,7 +452,7 @@
                 </div>
 
                 <div class="form-group hidden" id="groupLigneStandard">
-                    <label for="ligneParamText">Diamètre (centièmes /100) *</label>
+                    <label for="ligneParamText">Diamètre (/100) *</label>
                     <select id="ligneParamText" onchange="checkCustom(this, 'ligneParamCustom'); updateSpoolAdvice();">
                         <option value="16">16</option><option value="18">18</option>
                         <option value="20">20</option><option value="22">22</option>
@@ -451,7 +464,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="noeud1">Premier Nœud de Raccord *</label>
+                    <label for="noeud1">Premier nœud de raccord *</label>
                     <select id="noeud1">
                         <option value="\overset{\text{Alb}}{\sim}">Nœud Albright</option>
                         <option value="\overset{\text{FG}}{\sim}">Nœud FG</option>
@@ -464,9 +477,9 @@
             </div>
         </div>
 
-        <!-- 5. Bas de Ligne -->
+        <!-- 5. Bas de ligne -->
         <div class="section-card">
-            <h2>5. Bas de Ligne & Montage Spécifique</h2>
+            <h2>5. Bas de ligne & montage spécifique</h2>
             <div class="grid">
                 <div class="form-group">
                     <label for="bdl1Mat">Matériau *</label>
@@ -477,7 +490,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="bdl1Diam">Diamètre (centièmes /100) *</label>
+                    <label for="bdl1Diam">Diamètre (/100) *</label>
                     <select id="bdl1Diam" onchange="checkCustom(this, 'bdl1DiamCustom')">
                         <option value="16">16</option><option value="18">18</option>
                         <option value="20">20</option><option value="22">22</option>
@@ -493,41 +506,47 @@
 
                 <div class="form-group">
                     <label for="bdl1Long">Longueur *</label>
-                    <select id="bdl1Long" onchange="checkCustom(this, 'bdl1LongCustom')">
-                        <option value="1.2m">1.2m</option><option value="1.5m">1.5m</option>
-                        <option value="2m" selected>2m</option><option value="2.5m">2.5m</option>
-                        <option value="3m">3m</option><option value="45cm">45cm</option>
-                        <option value="custom">Autre...</option>
-                    </select>
-                    <input type="text" id="bdl1LongCustom" class="custom-input hidden" placeholder="ex: 1.8m">
+                    <div class="unit-group">
+                        <select id="bdl1Long" onchange="checkCustom(this, 'bdl1LongCustom')" style="flex:1;">
+                            <option value="0.45">0.45</option><option value="1.2">1.2</option>
+                            <option value="1.5">1.5</option><option value="2.0" selected>2.0</option>
+                            <option value="2.5">2.5</option><option value="3.0">3.0</option>
+                            <option value="custom">Autre...</option>
+                        </select>
+                        <select id="bdl1LongUnit" style="width: 60px;">
+                            <option value="m">m</option>
+                            <option value="cm">cm</option>
+                        </select>
+                    </div>
+                    <input type="text" id="bdl1LongCustom" class="custom-input hidden" placeholder="ex: 1.8">
                 </div>
             </div>
 
-            <h3 style="font-size: 0.95em; color: var(--text-muted); margin-top: 15px;">Avançon / Montage Spécifique (Optionnel)</h3>
+            <h3 style="font-size: 0.95em; color: var(--text-muted); margin-top: 15px;">Avançon / montage spécifique (optionnel)</h3>
             <div class="grid">
                 <div class="form-group">
-                    <label for="montageType">Style de Montage</label>
+                    <label for="montageType">Style de montage</label>
                     <select id="montageType" onchange="toggleMontageSpecial()">
-                        <option value="direct" selected>Ligne Directe / Avançon classique</option>
+                        <option value="direct" selected>Ligne directe / Avançon classique</option>
                         <option value="dropshot">Montage Drop-Shot (DS)</option>
                     </select>
                 </div>
 
                 <div class="form-group group-avancion-std">
-                    <label for="noeud2">Raccord Avançon</label>
+                    <label for="noeud2">Raccord avançon</label>
                     <select id="noeud2">
-                        <option value="none" selected>Aucun (Pas d'avançon)</option>
+                        <option value="none" selected>--</option>
                         <option value="\overset{\text{Gri}}{\sim}">Nœud Grinner / Uni</option>
-                        <option value="\overset{\text{Blood}}{\sim}">Nœud de Sang</option>
+                        <option value="\overset{\text{Blood}}{\sim}">Nœud de sang</option>
                         <option value="\varnothing_{\text{Sl}}">Sleeve (Sertissage)</option>
-                        <option value="ER">Émerillon Rolling (ER)</option>
+                        <option value="ER">Émerillon rolling (ER)</option>
                     </select>
                 </div>
 
                 <div class="form-group group-avancion-std">
-                    <label for="bdl2Mat">Matériau Avançon</label>
+                    <label for="bdl2Mat">Matériau avançon</label>
                     <select id="bdl2Mat">
-                        <option value="none">Aucun</option>
+                        <option value="none">--</option>
                         <option value="F">Fluorocarbone (F)</option>
                         <option value="St">Acier (St)</option>
                         <option value="Ti">Titane (Ti)</option>
@@ -536,7 +555,7 @@
                 </div>
 
                 <div class="form-group group-avancion-std">
-                    <label for="bdl2Diam">Diamètre Avançon (/100)</label>
+                    <label for="bdl2Diam">Diamètre avançon (/100)</label>
                     <select id="bdl2Diam" onchange="checkCustom(this, 'bdl2DiamCustom')">
                         <option value="40">40</option><option value="60">60</option>
                         <option value="80" selected>80</option><option value="100">100</option>
@@ -547,25 +566,25 @@
 
                 <div class="form-group group-ds hidden">
                     <label for="dsPlomb">Plomb Drop-Shot (g)</label>
-                    <input type="text" id="dsPlomb" value="7g">
+                    <input type="text" id="dsPlomb" value="7">
                 </div>
                 <div class="form-group group-ds hidden">
-                    <label for="dsEcart">Distance Hameçon-Plomb</label>
-                    <input type="text" id="dsEcart" value="40cm">
+                    <label for="dsEcart">Distance hameçon-plomb (cm)</label>
+                    <input type="text" id="dsEcart" value="40">
                 </div>
             </div>
         </div>
 
-        <!-- 6. Terminal & Boîte à Leurres -->
+        <!-- 6. Boîte à leurres -->
         <div class="section-card">
-            <h2>6. Attache Terminale & Boîte à Leurres (Champ des Possibles)</h2>
+            <h2>6. Attache terminale & boîte à leurres (champ des possibles)</h2>
             <div class="grid" style="margin-bottom: 15px;">
                 <div class="form-group">
-                    <label for="fixationFinal">Attache Terminale *</label>
+                    <label for="fixationFinal">Attache terminale *</label>
                     <select id="fixationFinal" onchange="checkIncoherences()">
                         <option value="A">Agrafe (A)</option>
-                        <option value="AB">Anneau Brisé (AB)</option>
-                        <option value="\overset{\text{Cui}}{\sim}">Nœud Cuillère</option>
+                        <option value="AB">Anneau brisé (AB)</option>
+                        <option value="\overset{\text{Cui}}{\sim}">Nœud cuillère</option>
                         <option value="\overset{\text{Rap}}{\sim}">Nœud Rapala</option>
                         <option value="\overset{\text{Pal}}{\sim}">Nœud Palomar</option>
                     </select>
@@ -575,15 +594,15 @@
             <div id="incoherenceWarning" class="alert-box hidden"></div>
 
             <div id="luresContainer"></div>
-            <button type="button" class="btn-add" onclick="addLureInput()">+ Ajouter une option de leurre dans la boîte</button>
+            <button type="button" class="btn-add" onclick="addLureInput()">+ Ajouter un leurre à la boîte</button>
         </div>
 
-        <button type="button" class="btn-submit" onclick="generateFormula()">⚡ Générer & Analyser la Formule</button>
+        <button type="button" class="btn-submit" onclick="generateFormula()">⚡ Générer & analyser la formule</button>
     </form>
 
     <!-- Résultat -->
     <div id="resultCard" class="result-box hidden">
-        <h3 style="margin-top:0; color:var(--accent);">Votre Formule Mathématique</h3>
+        <h3 style="margin-top:0; color:var(--accent);">Votre formule mathématique</h3>
         <div id="renderedMath" class="result-rendered"></div>
         <div id="rawLatex" class="raw-latex"></div>
         <button class="btn-copy" onclick="copyToClipboard()">📋 Copier le LaTeX</button>
@@ -595,19 +614,19 @@
             <div id="scoreBadge" class="score-badge"></div>
             <div id="alertsContainer"></div>
 
-            <!-- NOUVEAU : Graphique Dynamique 5 Zones SVG -->
+            <!-- Graphique dynamique multi-leurres -->
             <div class="chart-container">
-                <h4 style="margin: 0 0 10px 0; color: var(--accent); font-size: 0.95em;">📈 Courbe de Charge du Blank & Puce du Montage</h4>
-                <svg id="zoneChartSvg" viewBox="0 0 600 220" style="width: 100%; height: auto; display: block;"></svg>
+                <h4 style="margin: 0 0 10px 0; color: var(--accent); font-size: 0.95em;">Courbe de charge du blank & position des leurres</h4>
+                <svg id="zoneChartSvg" viewBox="0 0 600 230" style="width: 100%; height: auto; display: block;"></svg>
             </div>
 
-            <!-- Tableau d'Analyse des Formules -->
+            <!-- Tableau d'analyse des 5 zones -->
             <table style="width:100%; margin-top:15px; border-collapse:collapse; font-size:0.85em; text-align:left;">
                 <thead>
                     <tr style="border-bottom: 1px solid var(--border); color: var(--text-muted);">
-                        <th style="padding: 6px;">Zone Dynamique</th>
-                        <th style="padding: 6px;">Intervalle de Masse</th>
-                        <th style="padding: 6px;">Comportement & Physique du Lancer</th>
+                        <th style="padding: 6px;">Zone dynamique</th>
+                        <th style="padding: 6px;">Intervalle de masse</th>
+                        <th style="padding: 6px;">Comportement & physique du lancer</th>
                     </tr>
                 </thead>
                 <tbody id="physicsTableBody"></tbody>
@@ -728,7 +747,7 @@
             speedAdvice = "TMV lent/puissant (60-70cm/tmv) parfait pour Crankbait et Swimbaits lourds.";
         }
 
-        adviceBox.innerHTML = `💡 <b>Conseils Moulinet (${mTaille} ${ratio !== 'none' ? '- ' + ratio : ''}) :</b><br>` +
+        adviceBox.innerHTML = `💡 <b>Conseils moulinet (${mTaille} ${ratio !== '' ? '- ' + ratio : ''}) :</b><br>` +
             `• <b>Capacité :</b> Enrouler <b>${lenLine}</b> de ${lType === 'T' ? peVal : 'fil principal'}. ${backingText}<br>` +
             `• <b>Vitesse :</b> ${speedAdvice}`;
     }
@@ -745,7 +764,7 @@
             <button type="button" class="btn-remove" onclick="removeLure(${lureCount})">Supprimer</button>
             <div class="grid" style="margin-top: 5px;">
                 <div class="form-group">
-                    <label>Leurre</label>
+                    <label>Leurre L${lureCount}</label>
                     <select class="lure-type" onchange="updateLureSubParams(${lureCount})">
                         <option value="MN">Minnow (MN)</option>
                         <option value="JK">Jerkbait (JK)</option>
@@ -766,12 +785,12 @@
                         <option value="S">S (Small)</option>
                         <option value="M" selected>M (Medium)</option>
                         <option value="L">L (Large)</option>
-                        <option value="none">Aucune</option>
+                        <option value="none">--</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Poids (g)</label>
-                    <input type="text" class="lure-weight" value="${weightDef}" placeholder="ex: 15">
+                    <input type="number" class="lure-weight" value="${weightDef}" placeholder="ex: 15" step="0.1">
                 </div>
                 <div class="form-group lure-sub-param" id="lure_sub_${lureCount}"></div>
             </div>
@@ -800,9 +819,9 @@
             `;
         } else if (type === 'PT') {
             subBox.innerHTML = `
-                <label>Montage Souple</label>
+                <label>Montage souple</label>
                 <select class="lure-extra">
-                    <option value="TP7g">Tête Plombée (TP 7g)</option>
+                    <option value="TP7g">Tête plombée (TP 7g)</option>
                     <option value="Tex">Texan</option>
                     <option value="W">Weightless</option>
                 </select>
@@ -825,7 +844,7 @@
         const warningDiv = document.getElementById('incoherenceWarning');
 
         if (attache === 'A' && (lureTypes.includes('SP') || lureTypes.includes('CH'))) {
-            warningDiv.innerHTML = "⚠️ <b>Incohérence détectée :</b> L'utilisation d'une Agrafe (A) sur un Spinnerbait/Chatterbait à œillet ouvert est déconseillée (glissement de l'agrafe). Privilégiez un nœud direct ou un anneau brisé.";
+            warningDiv.innerHTML = "⚠️ <b>Incohérence détectée :</b> L'utilisation d'une agrafe (A) sur un Spinnerbait/Chatterbait à œillet ouvert est déconseillée (glissement de l'agrafe). Privilégiez un nœud direct ou un anneau brisé.";
             warningDiv.classList.remove('hidden');
         } else {
             warningDiv.classList.add('hidden');
@@ -841,10 +860,13 @@
         return (sel.value === 'none' || sel.value.toLowerCase() === 'standard') ? '' : sel.value;
     }
 
-    // --- MOTEUR DE DIAGNOSTIC ET RENDER DU GRAPHIQUE SVG ---
-    function evaluateCoherence(pMin, pMax, peValue, bdlDiameters, lureWeights, lureTypes) {
+    // MOTEUR DE DIAGNOSTIC ET RENDER SVG MULTI-LEURRES
+    function evaluateCoherence(pMin, pMax, peValue, bdlDiameters, lureDataList) {
         let alerts = [];
         let score = 10;
+
+        let lureWeights = lureDataList.map(l => l.weight);
+        let lureTypes = lureDataList.map(l => l.type);
 
         let minWeight = Math.min(...lureWeights);
         let maxWeight = Math.max(...lureWeights);
@@ -853,7 +875,7 @@
             if (minWeight < pMin && minWeight > 0) {
                 alerts.push({ 
                     type: 'red', 
-                    text: `⚠️ <b>Leurre sous-dimensionné :</b> Un des leurres (${minWeight}g) est trop léger pour la canne (${pMin}-${pMax}g). Perte de sensations au lancer.` 
+                    text: `⚠️ <b>Leurre sous-dimensionné :</b> Un des leurres de la boîte (${minWeight}g) est trop léger pour la canne (${pMin}-${pMax}g). Perte de sensations au lancer.` 
                 });
                 score -= 3;
             }
@@ -867,7 +889,7 @@
             if (minWeight >= pMin && maxWeight <= pMax) {
                 alerts.push({ 
                     type: 'green', 
-                    text: `✅ <b>Plage de Puissance :</b> Les leurres (${minWeight}g à ${maxWeight}g) sont adaptés à la canne (${pMin}-${pMax}g).` 
+                    text: `✅ <b>Plage de puissance :</b> Tous les leurres de la boîte (${minWeight}g à ${maxWeight}g) sont adaptés à la canne (${pMin}-${pMax}g).` 
                 });
             }
         }
@@ -914,34 +936,32 @@
 
         if (score < 0) score = 0;
 
-        // --- GÉNÉRATION DU GRAPHIQUE 5 ZONES SVG ---
-        renderFiveZoneChart(pMin, pMax, maxWeight);
+        // Rendu du graphique avec TOUS les leurres
+        renderMultiLureChart(pMin, pMax, lureDataList);
 
         return { score, alerts };
     }
 
-    function renderFiveZoneChart(pMin, pMax, currentLureWeight) {
+    function renderMultiLureChart(pMin, pMax, lureDataList) {
         const svg = document.getElementById('zoneChartSvg');
-        const w = 600, h = 220;
-        const margin = { top: 25, right: 30, bottom: 40, left: 45 };
+        const w = 600, h = 230;
+        const margin = { top: 30, right: 35, bottom: 40, left: 45 };
         const graphW = w - margin.left - margin.right;
         const graphH = h - margin.top - margin.bottom;
 
-        // Bornes dynamiques de l'axe X (de 0 à Pmax * 1.35)
-        const xMax = Math.max(pMax * 1.35, currentLureWeight * 1.15);
+        let maxLureWeight = Math.max(...lureDataList.map(l => l.weight), 0);
+        const xMax = Math.max(pMax * 1.35, maxLureWeight * 1.15);
         
-        // Bornes des 5 zones
-        const z1End = pMin; // Sous-charge: [0, pMin]
-        const z2End = pMin + 0.25 * (pMax - pMin); // Plage basse
-        const z3End = pMin + 0.75 * (pMax - pMin); // Sweet Spot
-        const z4End = pMax; // Plage haute
-        // Surcharge: [pMax, xMax]
+        const z1End = pMin;
+        const z2End = pMin + 0.25 * (pMax - pMin);
+        const z3End = pMin + 0.75 * (pMax - pMin);
+        const z4End = pMax;
 
         function getX(val) {
             return margin.left + (val / xMax) * graphW;
         }
 
-        function getY(efficiency) { // efficiency de 0.0 à 1.0
+        function getY(efficiency) {
             return margin.top + graphH - (efficiency * graphH);
         }
 
@@ -952,55 +972,65 @@
         const xZ4 = getX(z4End);
         const xZ5 = getX(xMax);
 
-        // Position du leurre sélectionné
-        const xLure = getX(currentLureWeight);
+        // Construction des marqueurs pour CHAQUE leurre de la boîte
+        let dotsHTML = "";
+        const colors = ["#06b6d4", "#eab308", "#ec4899", "#a855f7", "#3b82f6"];
 
-        // Calcul de l'efficience théorique (courbe parabole) pour placer le point Y
-        let lureEff = 0;
-        if (currentLureWeight < pMin) {
-            lureEff = 0.2 * (currentLureWeight / pMin);
-        } else if (currentLureWeight <= pMax) {
-            // Zone optimale entre 0.7 et 1.0
-            let ratio = (currentLureWeight - pMin) / (pMax - pMin);
-            lureEff = 1.0 - Math.pow(ratio - 0.5, 2) * 2.5; 
-            if (lureEff < 0.3) lureEff = 0.3;
-        } else {
-            lureEff = Math.max(0.1, 0.4 - (currentLureWeight - pMax) / (pMax * 0.5));
-        }
-        const yLure = getY(lureEff);
+        lureDataList.forEach((lure, index) => {
+            let lw = lure.weight;
+            let xPos = getX(lw);
+
+            let lureEff = 0;
+            if (lw < pMin) {
+                lureEff = 0.2 * (lw / Math.max(pMin, 1));
+            } else if (lw <= pMax) {
+                let ratio = (lw - pMin) / (pMax - pMin);
+                lureEff = 1.0 - Math.pow(ratio - 0.5, 2) * 2.5; 
+                if (lureEff < 0.3) lureEff = 0.3;
+            } else {
+                lureEff = Math.max(0.1, 0.4 - (lw - pMax) / (pMax * 0.5));
+            }
+            let yPos = getY(lureEff);
+
+            let dotColor = colors[index % colors.length];
+
+            dotsHTML += `
+                <line x1="${xPos}" y1="${margin.top}" x2="${xPos}" y2="${margin.top + graphH}" stroke="${dotColor}" stroke-dasharray="2,2" stroke-width="1.2" />
+                <circle cx="${xPos}" cy="${yPos}" r="6" fill="${dotColor}" stroke="#ffffff" stroke-width="2" />
+                <text x="${xPos}" y="${yPos - 10}" fill="${dotColor}" font-size="11" font-weight="bold" text-anchor="middle">${lure.type} (${lw}g)</text>
+            `;
+        });
 
         svg.innerHTML = `
-            <!-- Background Zones -->
+            <!-- Background 5 zones -->
             <rect x="${x0}" y="${margin.top}" width="${xZ1 - x0}" height="${graphH}" fill="rgba(239, 68, 68, 0.25)" />
             <rect x="${xZ1}" y="${margin.top}" width="${xZ2 - xZ1}" height="${graphH}" fill="rgba(234, 179, 8, 0.2)" />
             <rect x="${xZ2}" y="${margin.top}" width="${xZ3 - xZ2}" height="${graphH}" fill="rgba(34, 197, 94, 0.35)" />
             <rect x="${xZ3}" y="${margin.top}" width="${xZ4 - xZ3}" height="${graphH}" fill="rgba(234, 179, 8, 0.2)" />
             <rect x="${xZ4}" y="${margin.top}" width="${xZ5 - xZ4}" height="${graphH}" fill="rgba(239, 68, 68, 0.35)" />
 
-            <!-- Vertical Zone Lines -->
+            <!-- Lignes séparatrices de zones -->
             <line x1="${xZ1}" y1="${margin.top}" x2="${xZ1}" y2="${margin.top + graphH}" stroke="#ef4444" stroke-dasharray="3,3" />
             <line x1="${xZ2}" y1="${margin.top}" x2="${xZ2}" y2="${margin.top + graphH}" stroke="#22c55e" stroke-dasharray="3,3" />
             <line x1="${xZ3}" y1="${margin.top}" x2="${xZ3}" y2="${margin.top + graphH}" stroke="#22c55e" stroke-dasharray="3,3" />
             <line x1="${xZ4}" y1="${margin.top}" x2="${xZ4}" y2="${margin.top + graphH}" stroke="#ef4444" stroke-dasharray="3,3" />
 
-            <!-- Smooth Efficiency Curve -->
+            <!-- Courbe d'efficience -->
             <path d="M ${x0} ${getY(0.05)} 
                      Q ${xZ1} ${getY(0.2)}, ${xZ2} ${getY(0.85)} 
                      T ${xZ3} ${getY(0.85)} 
                      Q ${xZ4} ${getY(0.4)}, ${xZ5} ${getY(0.05)}" 
                   fill="none" stroke="#06b6d4" stroke-width="3" />
 
-            <!-- Point du montage sélectionné -->
-            <line x1="${xLure}" y1="${margin.top}" x2="${xLure}" y2="${margin.top + graphH}" stroke="#ffffff" stroke-width="1.5" />
-            <circle cx="${xLure}" cy="${yLure}" r="7" fill="#ffffff" stroke="#06b6d4" stroke-width="3" />
-            <text x="${xLure}" y="${yLure - 12}" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">${currentLureWeight}g</text>
+            <!-- Points de tous les leurres -->
+            ${dotsHTML}
 
-            <!-- Axis X Labels -->
+            <!-- Axes X -->
             <text x="${x0}" y="${h - 10}" fill="#94a3b8" font-size="10">0g</text>
             <text x="${xZ1}" y="${h - 10}" fill="#fca5a5" font-size="10" text-anchor="middle">Pmin (${pMin}g)</text>
             <text x="${xZ4}" y="${h - 10}" fill="#fca5a5" font-size="10" text-anchor="middle">Pmax (${pMax}g)</text>
 
-            <!-- Zone Titles (Headers) -->
+            <!-- Titres des zones -->
             <text x="${(x0 + xZ1)/2}" y="${margin.top - 8}" fill="#fca5a5" font-size="9" text-anchor="middle">1. Sous-charge</text>
             <text x="${(xZ1 + xZ2)/2}" y="${margin.top - 8}" fill="#fde047" font-size="9" text-anchor="middle">2. Basse</text>
             <text x="${(xZ2 + xZ3)/2}" y="${margin.top - 8}" fill="#86efac" font-size="10" font-weight="bold" text-anchor="middle">3. SWEET SPOT</text>
@@ -1008,34 +1038,34 @@
             <text x="${(xZ4 + xZ5)/2}" y="${margin.top - 8}" fill="#fca5a5" font-size="9" text-anchor="middle">5. Surcharge</text>
         `;
 
-        // Mise à jour du tableau physique
+        // Mise à jour du tableau
         const sweetMin = z2End;
         const sweetMax = z3End;
         const tableBody = document.getElementById('physicsTableBody');
 
         tableBody.innerHTML = `
-            <tr style="border-bottom: 1px solid var(--border); ${currentLureWeight < pMin ? 'background:rgba(239,68,68,0.15);' : ''}">
+            <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: 6px; color:#fca5a5;"><b>1. Sous-charge</b></td>
                 <td style="padding: 6px;">0g à ${pMin}g</td>
-                <td style="padding: 6px;">Le scion ne fléchit pas. Restitution d'énergie nulle, lancers très courts.</td>
+                <td style="padding: 6px;">Le scion ne fléchit pas. Restitution d'énergie faible, lancers courts.</td>
             </tr>
-            <tr style="border-bottom: 1px solid var(--border); ${(currentLureWeight >= pMin && currentLureWeight < sweetMin) ? 'background:rgba(234,179,8,0.15);' : ''}">
-                <td style="padding: 6px; color:#fde047;"><b>2. Plage Basse</b></td>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 6px; color:#fde047;"><b>2. Plage basse</b></td>
                 <td style="padding: 6px;">${pMin}g à ${sweetMin.toFixed(1)}g</td>
-                <td style="padding: 6px;">Chargement léger du scion. Idéal pour les pêches fines et tactiles.</td>
+                <td style="padding: 6px;">Chargement léger du scion. Idéal pour la précision et les pêches tactiles.</td>
             </tr>
-            <tr style="border-bottom: 1px solid var(--border); ${(currentLureWeight >= sweetMin && currentLureWeight <= sweetMax) ? 'background:rgba(34,197,94,0.15);' : ''}">
-                <td style="padding: 6px; color:#86efac;"><b>3. Sweet Spot (Zone Optimale)</b></td>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 6px; color:#86efac;"><b>3. Sweet spot (zone optimale)</b></td>
                 <td style="padding: 6px; color:#4ade80;"><b>${sweetMin.toFixed(1)}g à ${sweetMax.toFixed(1)}g</b></td>
-                <td style="padding: 6px;">Rendement mécanique maximal (ressort parfait). Lancers longs sans effort.</td>
+                <td style="padding: 6px;">Rendement mécanique maximal. Compression idéale du blank pour des lancers longs sans effort.</td>
             </tr>
-            <tr style="border-bottom: 1px solid var(--border); ${(currentLureWeight > sweetMax && currentLureWeight <= pMax) ? 'background:rgba(234,179,8,0.15);' : ''}">
-                <td style="padding: 6px; color:#fde047;"><b>4. Plage Haute</b></td>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 6px; color:#fde047;"><b>4. Plage haute</b></td>
                 <td style="padding: 6px;">${sweetMax.toFixed(1)}g à ${pMax}g</td>
-                <td style="padding: 6px;">Canne très sollicitée. Lancer fluide recommandé (éviter le fouetté sec).</td>
+                <td style="padding: 6px;">Canne très sollicitée. Lancer fluide recommandé (éviter le coup de fouet sec).</td>
             </tr>
-            <tr style="border-bottom: 1px solid var(--border); ${currentLureWeight > pMax ? 'background:rgba(239,68,68,0.15);' : ''}">
-                <td style="padding: 6px; color:#fca5a5;"><b>5. Surcharge Critiques</b></td>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 6px; color:#fca5a5;"><b>5. Surcharge critique</b></td>
                 <td style="padding: 6px;">> ${pMax}g</td>
                 <td style="padding: 6px; color:#fca5a5;">DANGER : Contrainte supérieure à la résistance mécanique du blank (risque de casse).</td>
             </tr>
@@ -1043,7 +1073,10 @@
     }
 
     function generateFormula() {
-        const cLong = getVal('canneLong', 'canneLongCustom');
+        const cLongVal = getVal('canneLong', 'canneLongCustom');
+        const cLongUnit = document.getElementById('canneLongUnit').value;
+        const cLong = `${cLongVal}${cLongUnit}`;
+
         const cAction = getVal('canneAction', null);
         const minPVal = getVal('puiMin', 'puiMinCustom');
         const maxPVal = getVal('puiMax', 'puiMaxCustom');
@@ -1052,7 +1085,7 @@
         let maxP = parseFloat(maxPVal) || 0;
 
         if (minP < 0 || maxP <= 0 || minP >= maxP || maxP > 1000) {
-            alert("Erreur dans les puissances de la canne : la puissance Min doit être inférieure à la puissance Max (ex: 7 à 28g).");
+            alert("Erreur dans les puissances de la canne : la puissance min doit être inférieure à la puissance max (ex: 7 à 28g).");
             return;
         }
 
@@ -1089,7 +1122,10 @@
 
         const bdl1Mat = document.getElementById('bdl1Mat').value;
         const bdl1Diam = getVal('bdl1Diam', 'bdl1DiamCustom');
-        const bdl1Long = getVal('bdl1Long', 'bdl1LongCustom');
+        const bdl1LongVal = getVal('bdl1Long', 'bdl1LongCustom');
+        const bdl1LongUnit = document.getElementById('bdl1LongUnit').value;
+        const bdl1Long = `${bdl1LongVal}${bdl1LongUnit}`;
+
         let bdl1Str = `${bdl1Mat}_{\\text{${bdl1Long}}}^{${bdl1Diam}}`;
         let bdl1DiamNum = parseFloat(bdl1Diam) || 0;
 
@@ -1100,15 +1136,14 @@
         if (montageType === 'dropshot') {
             const dsP = document.getElementById('dsPlomb').value;
             const dsE = document.getElementById('dsEcart').value;
-            section2Str = ` \\overset{\\text{Pal}}{\\sim} H_{\\text{Texan}} \\ \\overset{${dsE}}{\\sim} \\ P_{${dsP}}`;
+            section2Str = ` \\overset{\\text{Pal}}{\\sim} H_{\\text{Texan}} \\ \\overset{${dsE}\\text{cm}}{\\sim} \\ P_{${dsP}\\text{g}}`;
         } else {
             const noeud2 = document.getElementById('noeud2').value;
             const bdl2Mat = getVal('bdl2Mat', null);
             const bdl2Diam = getVal('bdl2Diam', 'bdl2DiamCustom');
-            const bdl2Long = getVal('bdl2Long', 'bdl2LongCustom');
 
             if (noeud2 !== "none" && bdl2Mat) {
-                section2Str = ` ${noeud2} ${bdl2Mat}_{\\text{${bdl2Long}}}^{${bdl2Diam}}`;
+                section2Str = ` ${noeud2} ${bdl2Mat}^{${bdl2Diam}}`;
                 bdl2DiamNum = parseFloat(bdl2Diam) || 0;
             }
         }
@@ -1116,22 +1151,20 @@
         const fixFinal = document.getElementById('fixationFinal').value;
         const lureItems = document.querySelectorAll('.lure-item');
         let luresArray = [];
-        let lureWeights = [];
-        let lureTypes = [];
+        let lureDataList = [];
 
         lureItems.forEach(item => {
             const lType = item.querySelector('.lure-type').value;
             const lSize = item.querySelector('.lure-size').value;
-            const lWeight = item.querySelector('.lure-weight').value;
+            const lWeightStr = item.querySelector('.lure-weight').value;
             const extraElem = item.querySelector('.lure-extra');
             const lExtra = extraElem ? extraElem.value : '';
 
-            lureTypes.push(lType);
-            let matchW = lWeight.match(/[\d\.]+/);
-            if (matchW) lureWeights.push(parseFloat(matchW[0]));
+            let wNum = parseFloat(lWeightStr) || 0;
+            lureDataList.push({ type: lType, weight: wNum });
 
             let sizeSub = (lSize !== 'none') ? `_{\\mathbf{${lSize}${lExtra ? ', ' + lExtra : ''}}}` : '';
-            let weightSup = lWeight ? `^{${lWeight}\\text{g}}` : '';
+            let weightSup = lWeightStr ? `^{${lWeightStr}\\text{g}}` : '';
             luresArray.push(`${lType}${sizeSub}${weightSup}`);
         });
 
@@ -1145,7 +1178,7 @@
         const renderedDiv = document.getElementById('renderedMath');
         renderedDiv.innerHTML = `\\[ ${latexFormula} \\]`;
 
-        const diag = evaluateCoherence(minP, maxP, peVal, [bdl1DiamNum, bdl2DiamNum], lureWeights, lureTypes);
+        const diag = evaluateCoherence(minP, maxP, peVal, [bdl1DiamNum, bdl2DiamNum], lureDataList);
         
         const badgeElem = document.getElementById('scoreBadge');
         badgeElem.innerText = `score de cohérence : ${diag.score} / 10`;
